@@ -28,4 +28,6 @@
 
 ### Do you want to experiment with this project?
 
-##### Clone this repository using: git clone https://github.com/jjla26/myFlixClient.git
+##### Clone this repository using: `git clone https://github.com/jjla26/myFlixClient.git`
+
+##### After cloning the repository run: `npm install` to install all the dependencies
