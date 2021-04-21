@@ -1,33 +1,45 @@
 import React, { Component } from 'react'
+import { Container, Image, Row, Button } from 'react-bootstrap'
+import { usePalette } from 'react-palette'
 
-class MovieView extends Component {
-  render() {
-    const { movie, onBackButton, asdasd } = this.props
-    return (
-      <div className="movie-view">
-        <div className="movie-poster">
-          <img src={movie.ImagePath} />
-        </div>
-        <div className="movie-title">
-          <span className="label">Title: </span>
-          <span className="value">{movie.Title}</span>
-        </div>
-        <div className="movie-description">
-          <span className="label">Description: </span>
-          <span className="value">{movie.Description}</span>
-        </div>
-        <div className="movie-genre">
-          <span className="label">Genre: </span>
-          <span className="value">{movie.Genre?.Name}</span>
-        </div>
-        <div className="movie-director">
-          <span className="label">Director: </span>
-          <span className="value">{movie.Director?.Name}</span>
-        </div>
-        <button onClick={() => onBackButton(null)}>Back</button>
-       </div>
-    )
-  }
+import './movie-view.scss'
+
+const styles = {
+  movieView: (color, lightColor) => ({
+    backgroundImage: `linear-gradient(170deg, ${color}, ${lightColor}, transparent)`
+  })
+}
+
+function MovieView(props){
+  const { movie, onBackButton } = props
+  const { data, loading, error } = usePalette(movie.ImagePath)
+
+  return (
+    <Container fluid className="movie-view" style={styles.movieView(data.darkVibrant, data.lightVibrant)}>
+      <Row className="justify-content-center">
+        <Image className="movie-view__image" src={movie.ImagePath} />
+      </Row>
+      <Row className="justify-content-center">
+        <span className="label">Title: </span>
+        <span className="value">{movie.Title}</span>
+      </Row>
+      <Row className="justify-content-center">
+        <span className="label">Description: </span>
+        <span className="value">{movie.Description}</span>
+      </Row>
+      <Row className="justify-content-center">
+        <span className="label">Genre: </span>
+        <span className="value">{movie.Genre?.Name}</span>
+      </Row>
+      <Row className="justify-content-center">
+        <span className="label">Director: </span>
+        <span className="value">{movie.Director?.Name}</span>
+      </Row>
+      <Row className="justify-content-center">
+        <Button onClick={() => onBackButton(null)}>Back</Button>
+      </Row>
+      </Container>
+  )
 }
 
 export default MovieView
