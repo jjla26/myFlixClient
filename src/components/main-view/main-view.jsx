@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios';
+import { Container, Row, Col } from 'react-bootstrap'
 
 import LoginView from '../login-view/login-view';
 import MovieCard from '../movie-card/movie-card';
@@ -47,13 +48,21 @@ class MainView extends Component {
     if (movies.length === 0) return <div className="main-view"></div>; // Rendering string if movie array is empty
   
     return (
-      <div className="main-view">
+      <>
         {selectedMovie ? 
         <MovieView movie={selectedMovie} onBackButton={this.setSelectedMovie} />
         : 
-        movies.map(movie => <MovieCard key={movie._id} movie={movie} onMovieClick={this.setSelectedMovie} />)
+        <Container>
+          <Row xs={1} md={2} lg={3} noGutters>
+            {movies.map(movie => 
+            <Col className="d-flex justify-content-center" key={movie._id}>
+              <MovieCard movie={movie} onMovieClick={this.setSelectedMovie} />
+            </Col>
+            )}
+          </Row>
+        </Container>
         }
-      </div>
+      </>
     );
   }
 };
