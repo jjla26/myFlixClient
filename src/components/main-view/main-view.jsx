@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Container, Row, Col } from 'react-bootstrap'
 
 import MovieCard from '../movie-card/movie-card';
 import MovieView from '../movie-view/movie-view';
@@ -70,16 +71,24 @@ class MainView extends Component {
   render() {
     const { movies, selectedMovie } = this.state;
 
-    if (movies.length === 0) return <div className="main-view">The list is empty!</div>; // Rendering string if movie array is empty
+    if (movies.length === 0) return <Container>The list is empty!</Container>; // Rendering string if movie array is empty
   
     return (
-      <div className="main-view">
+      <>
         {selectedMovie ? 
         <MovieView movie={selectedMovie} onBackButton={this.setSelectedMovie} />
         : 
-        movies.map(movie => <MovieCard key={movie._id} movie={movie} onMovieClick={this.setSelectedMovie} />)
+        <Container>
+          <Row xs={1} md={2} lg={3} noGutters>
+            {movies.map(movie => 
+            <Col className="d-flex justify-content-center" key={movie._id}>
+              <MovieCard movie={movie} onMovieClick={this.setSelectedMovie} />
+            </Col>
+            )}
+          </Row>
+        </Container>
         }
-      </div>
+      </>
     );
   }
 };
