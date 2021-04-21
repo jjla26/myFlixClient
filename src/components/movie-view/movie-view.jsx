@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 class MovieView extends Component {
   render() {
     const { movie, onBackButton, asdasd } = this.props
-    console.log(this.props)
     return (
       <div className="movie-view">
         <div className="movie-poster">
