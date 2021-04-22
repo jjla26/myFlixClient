@@ -69,21 +69,19 @@ class MainView extends Component {
     if (movies.length === 0) return <div className="main-view"></div>; // Rendering string if movie array is empty
   
     return (
-      <>
-        {selectedMovie ? 
-        <MovieView movie={selectedMovie} onBackButton={this.setSelectedMovie} />
-        : 
-        <Container>
-          <Row xs={1} md={2} lg={4} noGutters>
-            {movies.map(movie => 
-            <Col className="d-flex justify-content-center" key={movie._id} >
+      <Row className="main-view d-flex justify-content-md-center">
+          {selectedMovie ?
+            <Col>
+              <MovieView movie={selectedMovie} onBackButton={this.setSelectedMovie} />
+            </Col>
+          : 
+            movies.map(movie => 
+            <Col className="d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
               <MovieCard movie={movie} onMovieClick={this.setSelectedMovie} />
             </Col>
-            )}
-          </Row>
-        </Container>
-        }
-      </>
+            )
+          }
+      </Row>
     );
   }
 };
