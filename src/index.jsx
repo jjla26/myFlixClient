@@ -9,7 +9,9 @@ import './index.scss';
 class MyFlixApplication extends Component {
   render() {
     return (
-      <MainView />
+      <div className="my-flix">
+        <MainView/>
+      </div>
     );
   }
 }
