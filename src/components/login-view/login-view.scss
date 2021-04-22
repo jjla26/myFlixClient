@@ -1,0 +1,28 @@
+@import '../../index.scss';
+
+.login-view {
+  background-image: url('../../img/movie.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 100vh;
+  .login-card {
+    height: 370px;
+    width: 400px;
+    background-color: rgba(0,0,0,0.6) !important;
+    .login-card__header {
+      font-size: 25px;
+    }
+    .login-card__prepend{
+      width: 50px;
+      background-color: $primary;
+      color: $color-secondary;
+      display: flex;
+      justify-content: center; 
+      align-items: center;
+      border-radius: 2px 0px 0px 2px; 
+    }
+  }
+}
+
+
+
