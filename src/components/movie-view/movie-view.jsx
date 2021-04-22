@@ -5,8 +5,8 @@ import { usePalette } from 'react-palette'
 import './movie-view.scss'
 
 const styles = {
-  movieView: (color, lightColor) => ({
-    backgroundImage: `linear-gradient(170deg, ${color}, ${lightColor}, transparent)`
+  movieView: (color) => ({
+    backgroundImage: `linear-gradient(170deg, ${color}, transparent)`
   })
 }
 
@@ -15,7 +15,7 @@ function MovieView(props){
   const { data, loading, error } = usePalette(movie.ImagePath)
 
   return (
-    <Container fluid className="movie-view" style={styles.movieView(data.darkVibrant, data.lightVibrant)}>
+    <Container fluid className="movie-view" style={styles.movieView(data.vibrant)}>
       <Row className="justify-content-center">
         <Image className="movie-view__image" src={movie.ImagePath} />
       </Row>
