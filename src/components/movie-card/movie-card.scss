@@ -1,9 +1,15 @@
-.movie-card {
-  width: 15rem;
-  cursor: pointer;
-}
+@import '../../index.scss';
 
-.movie-card:hover {
-  width: 17rem;
-  font-size: 18px;
+.movie-card {
+  width: 14rem;
+  cursor: pointer;
+  background-color: rgba(0,0,0,0.6) !important;
+  margin: 10px;
+  transition: transform 0.3s;
+  &:hover {
+    transform: scale(1.2);
+    z-index: 1;
+    background-color: $color-secondary !important;
+
+  }
 }
