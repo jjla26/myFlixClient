@@ -40,11 +40,23 @@ class MainView extends Component {
 
   /* When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
   onLoggedIn(user) {
-    this.setState({ user });
+    axios.post('https://moviesapi-node.herokuapp.com/login', user)
+    .then(response => {
+      this.setState({ user: response.data.data})
+    })
+    .catch(error => {
+      console.log(error)
+    })
   }
 
   onSignUp(user) {
-    console.log(user)
+    axios.post('https://moviesapi-node.herokuapp.com/users', user)
+    .then(response => {
+      this.setState({ register: false })
+    })
+    .catch(error => {
+      console.log(error)
+    })
   }
 
   render() {

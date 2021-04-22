@@ -14,7 +14,11 @@ function RegistrationView(props) {
 
   const handleSubmit = e => {
     e.preventDefault();
-    onSignUp(username);
+    onSignUp({
+      Username: username, 
+      Email: email, 
+      Password: password, 
+      Birthday: birthday});
   };
 
   return (

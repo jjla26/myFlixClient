@@ -11,7 +11,10 @@ function LoginView(props) {
 
   const handleSubmit = e => {
     e.preventDefault();
-    onLoggedIn(username);
+    onLoggedIn({
+      Username: username, 
+      Password: password
+    });
   };
 
   return (
