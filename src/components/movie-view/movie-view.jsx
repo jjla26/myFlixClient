@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import { Container, Image, Row, Button } from 'react-bootstrap'
 import { usePalette } from 'react-palette'
 
@@ -40,6 +41,21 @@ function MovieView(props){
       </Row>
       </Container>
   )
+}
+
+MovieView.propTypes = {
+  movie: PropTypes.shape({
+    Title: PropTypes.string.isRequired,
+    Description: PropTypes.string.isRequired,
+    Genre: PropTypes.shape({
+      Name: PropTypes.string.isRequired
+    }),
+    Director: PropTypes.shape({
+      Name: PropTypes.string.isRequired
+    }),
+    ImagePath: PropTypes.string.isRequired 
+  }).isRequired,  
+  onBackButton: PropTypes.func.isRequired
 }
 
 export default MovieView

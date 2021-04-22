@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Container, Card, Form, Button, InputGroup } from 'react-bootstrap'
 import { PersonFill, KeyFill, Calendar2DateFill } from 'react-bootstrap-icons'
 
@@ -86,5 +87,10 @@ function RegistrationView(props) {
     </Container>
   );
 }
+
+RegistrationView.propTypes = {
+  onSignUp: PropTypes.func.isRequired,
+  setRegister: PropTypes.func.isRequired
+};
 
 export default RegistrationView
