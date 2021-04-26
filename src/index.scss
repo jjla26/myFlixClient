@@ -11,3 +11,9 @@ $secondary: #231f20;
   padding: 0;
   min-height: 100vh;
 }
+
+.error-message {
+  position: fixed;
+  bottom: 0;
+  right: 0
+}
