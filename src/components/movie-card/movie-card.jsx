@@ -9,15 +9,10 @@ class MovieCard extends Component {
     const { movie, onMovieClick } = this.props  
     return (
       <Card className="movie-card" onClick={() => onMovieClick(movie)}>
-        <Card.Body>
-          <Card.Text>
-            {movie.Title}
-          </Card.Text>
-        </Card.Body>
         <Card.Img src={movie.ImagePath} />
         <Card.Body>
           <Card.Text>
-            Genre: {movie.Genre ? movie.Genre.Name : ""}
+            {movie.Title}
           </Card.Text>
         </Card.Body>
       </Card>
