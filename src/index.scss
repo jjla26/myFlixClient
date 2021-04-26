@@ -1,13 +1,13 @@
 @import "custom";
 
-$bg: #231F20;
 $color: white;
 $color-secondary: black;
 $primary:#ffc312;
 $secondary: #231f20;
 
 .my-flix {
-  background-color: $bg;
+  background-color: $secondary;
   color: $color;
   padding: 0;
+  min-height: 100vh;
 }
