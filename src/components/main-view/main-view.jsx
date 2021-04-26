@@ -69,7 +69,7 @@ function MainView(){
             </Col>
           : 
             movies.map(movie => 
-            <Col className="d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
+            <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
               <MovieCard movie={movie} onMovieClick={movie => setSelectedMovie(movie)} />
             </Col>
             )
