@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Card, Form, Button, InputGroup } from 'react-bootstrap'
+import { Row, Col, Card, Form, Button, InputGroup, Spinner } from 'react-bootstrap'
 import { PersonFill, KeyFill, Calendar2DateFill } from 'react-bootstrap-icons'
 
 import './registration-view.scss'
 
 function RegistrationView(props) {
-  const { setRegister, onSignUp } = props
+  const { setRegister, onSignUp, loading } = props
   const [ username, setUsername ] = useState('');
   const [ email, setEmail ] = useState('');
   const [ password, setPassword ] = useState('');
@@ -79,12 +79,15 @@ function RegistrationView(props) {
                 </InputGroup>
               </Form.Group>
 
+              {loading ? 
+              <Spinner className="float-right" animation="grow" variant="primary"/>
+              :
               <Button className="float-right" variant="primary" type="submit" onClick={handleSubmit}>
                 SignUp
-              </Button>
+              </Button>}
             </Form>
           </Card.Body>
-          <Card.Footer>Do you have an account? <a href="#" onClick={() => setRegister(false)}>Sign In</a></Card.Footer>
+          {!loading &&<Card.Footer>Do you have an account? <a href="#" onClick={() => setRegister(false)}>Sign In</a></Card.Footer>}
         </Card>
       </Col>
 
