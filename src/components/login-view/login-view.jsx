@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Card, Form, Button, InputGroup, Spinner } from 'react-bootstrap'
+import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill } from 'react-bootstrap-icons'
 
 import './login-view.scss'
 
 function LoginView(props) {
-  const { setRegister, onLoggedIn, loading } = props
+  const { setRegister, onLoggedIn, loading, error } = props
   const [ username, setUsername ] = useState('');
   const [ password, setPassword ] = useState('');
 
@@ -59,6 +59,7 @@ function LoginView(props) {
           {!loading && <Card.Footer>Don't you have an account? <a href="#" onClick={() => setRegister(true)}>Sign Up</a></Card.Footer>}
         </Card>
       </Col>
+      <Alert show={!!error} className="error-message" variant="primary">{error}</Alert>
     </Row>
   );
 }

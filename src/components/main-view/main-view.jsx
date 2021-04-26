@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios';
-import { Container, Row, Col, Spinner } from 'react-bootstrap'
+import { Container, Row, Col, Spinner, Alert } from 'react-bootstrap'
 
 import Navbar from '../navigation/navigation';
 import LoginView from '../login-view/login-view';
@@ -28,6 +28,7 @@ function MainView(){
       setUser(response)
     } catch (error) {
       setLoading(false)
+      setError(error)
     }
   }
 
@@ -39,8 +40,15 @@ function MainView(){
       setRegister(false)
     } catch (error) {
       setLoading(false)
+      setError(error)
     }
   }
+
+  useEffect(() => {
+    if(error){
+      setTimeout(() => setError(null), 3000)
+    }
+  },[error])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,16 +56,23 @@ function MainView(){
         const response = await apiRequest('GET', '/movies')
         setMovies(response)
       } catch (error) {
+        setError(error)
       }
     }
     fetchData()
   },[])
 
-  if(register) return <RegistrationView loading={loading} setRegister={register => setRegister(register)} onSignUp={user => onSignUp(user)} />
+  if(register) return <RegistrationView error={error} loading={loading} setRegister={register => setRegister(register)} onSignUp={user => onSignUp(user)} />
   /* If there is no user, the LoginView is rendered. If there is a user logged in, the user details are *passed as a prop to the LoginView*/
-  if (!user) return <LoginView loading={loading} setRegister={register => setRegister(register)} onLoggedIn={user => onLoggedIn(user)} />;
+  if (!user) return <LoginView error={error} loading={loading} setRegister={register => setRegister(register)} onLoggedIn={user => onLoggedIn(user)} />;
 
-  if (movies.length === 0) return <div className="main-view"></div>; // Rendering string if movie array is empty
+  let renderMovies
+  if (movies.length === 0) renderMovies = <div className="main-view"></div>; // Rendering movies just if there are movies
+  else renderMovies = movies.map(movie => 
+    <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
+      <MovieCard movie={movie} onMovieClick={movie => setSelectedMovie(movie)} />
+    </Col>
+    )
 
   return (
     <>
@@ -68,13 +83,10 @@ function MainView(){
               <MovieView movie={selectedMovie} onBackButton={movie => setSelectedMovie(movie)} />
             </Col>
           : 
-            movies.map(movie => 
-            <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
-              <MovieCard movie={movie} onMovieClick={movie => setSelectedMovie(movie)} />
-            </Col>
-            )
+            renderMovies
           }
       </Row>
+      <Alert show={!!error} className="error-message" variant="primary">{error}</Alert>
     </>
   );
 };

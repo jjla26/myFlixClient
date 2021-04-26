@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Card, Form, Button, InputGroup, Spinner } from 'react-bootstrap'
+import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill, Calendar2DateFill } from 'react-bootstrap-icons'
 
 import './registration-view.scss'
@@ -90,7 +90,7 @@ function RegistrationView(props) {
           {!loading &&<Card.Footer>Do you have an account? <a href="#" onClick={() => setRegister(false)}>Sign In</a></Card.Footer>}
         </Card>
       </Col>
-
+      <Alert show={!!error} className="error-message" variant="primary">{error}</Alert>
     </Row>
   );
 }
