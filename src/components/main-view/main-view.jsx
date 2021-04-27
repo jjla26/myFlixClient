@@ -12,7 +12,6 @@ import './main-view.scss'
 
 function MainView(){
   const apiRequest = useRequest()
-  const [ loading, setLoading ] = useState(false)
   const [ error, setError ] = useState(false)
   const [ movies, setMovies ] = useState([])
   const [ selectedMovie, setSelectedMovie ] = useState(null)
@@ -20,28 +19,12 @@ function MainView(){
   const [ register, setRegister ] = useState(false)
 
   /* When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
-  const onLoggedIn = async user => {
-    setLoading(true)
-    try {
-      const response = await apiRequest('POST', '/login', user) 
-      setLoading(false)
-      setUser(response)
-    } catch (error) {
-      setLoading(false)
-      setError(error)
-    }
+  const onLoggedIn = user => {
+    setUser(user)
   }
 
-  const onSignUp = async user => {
-    setLoading(true)
-    try {
-      await apiRequest('POST', '/users', user)
-      setLoading(false)
-      setRegister(false)
-    } catch (error) {
-      setLoading(false)
-      setError(error)
-    }
+  const onSignUp = () => {
+    setRegister(false)
   }
 
   useEffect(() => {
@@ -62,9 +45,9 @@ function MainView(){
     fetchData()
   },[])
 
-  if(register) return <RegistrationView error={error} loading={loading} setRegister={register => setRegister(register)} onSignUp={user => onSignUp(user)} />
+  if(register) return <RegistrationView setRegister={register => setRegister(register)} onSignUp={user => onSignUp(user)} />
   /* If there is no user, the LoginView is rendered. If there is a user logged in, the user details are *passed as a prop to the LoginView*/
-  if (!user) return <LoginView error={error} loading={loading} setRegister={register => setRegister(register)} onLoggedIn={user => onLoggedIn(user)} />;
+  if (!user) return <LoginView setRegister={register => setRegister(register)} onLoggedIn={user => onLoggedIn(user)} />;
 
   let renderMovies
   if (movies.length === 0) renderMovies = <div className="main-view"></div>; // Rendering movies just if there are movies

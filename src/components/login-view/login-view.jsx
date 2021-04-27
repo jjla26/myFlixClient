@@ -3,15 +3,28 @@ import PropTypes from 'prop-types';
 import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill } from 'react-bootstrap-icons'
 
+import useRequest from '../../hooks/useRequest'
 import './login-view.scss'
 
 function LoginView(props) {
-  const { setRegister, onLoggedIn, loading, error } = props
+  const { setRegister, onLoggedIn } = props
+  const apiRequest = useRequest()
+  const [ loading, setLoading ] = useState(false)
+  const [ error, setError ] = useState(false)
   const [ username, setUsername ] = useState('');
   const [ password, setPassword ] = useState('');
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
+    setLoading(true)
+    try {
+      const response = await apiRequest('POST', '/login', {Username: username, Password: password}) 
+      setLoading(false)
+      onLoggedIn(response)
+    } catch (error) {
+      setLoading(false)
+      setError(error)
+    }
     onLoggedIn({
       Username: username, 
       Password: password

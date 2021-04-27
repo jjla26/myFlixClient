@@ -3,27 +3,41 @@ import PropTypes from 'prop-types';
 import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill, Calendar2DateFill } from 'react-bootstrap-icons'
 
+import useRequest from '../../hooks/useRequest'
 import './registration-view.scss'
 
 function RegistrationView(props) {
-  const { setRegister, onSignUp, loading } = props
+  const { setRegister, onSignUp } = props
+  const apiRequest = useRequest()
+  const [ loading, setLoading ] = useState(false)
+  const [ error, setError ] = useState(false)
   const [ username, setUsername ] = useState('');
   const [ email, setEmail ] = useState('');
   const [ password, setPassword ] = useState('');
   const [ passwordConfirmation, setPasswordConfirmation ] = useState('');
   const [ birthday, setBirthday ] = useState('');
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
+    console.log(username, password, birthday, email)
     e.preventDefault();
-    onSignUp({
-      Username: username, 
-      Email: email, 
-      Password: password, 
-      Birthday: birthday});
+    setLoading(true)
+    try {
+      await apiRequest('POST', '/users', {
+        Username: username, 
+        Email: email, 
+        Password: password, 
+        Birthday: birthday 
+      }) 
+      setLoading(false)
+      onSignUp()
+    } catch (error) {
+      setLoading(false)
+      setError(error)
+    }
   };
 
   return (
-    <Row className="registration-view" fluid>
+    <Row className="registration-view">
       <Col className="d-flex flex-column justify-content-center align-items-center" xs={12}>
         <h1>MyFlix</h1>
       </Col>
