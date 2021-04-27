@@ -25,10 +25,6 @@ function LoginView(props) {
       setLoading(false)
       setError(error)
     }
-    onLoggedIn({
-      Username: username, 
-      Password: password
-    });
   };
 
   return (
