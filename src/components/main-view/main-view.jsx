@@ -19,12 +19,26 @@ function MainView(){
   const [ register, setRegister ] = useState(false)
 
   /* When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
-  const onLoggedIn = user => {
-    setUser(user)
+  const onLoggedIn = authData => {
+    setUser(authData.data)
+    localStorage.setItem('token', authData.token);
+    localStorage.setItem('user', authData.data.Username);
+    getMovies(authData.token);
   }
 
   const onSignUp = () => {
     setRegister(false)
+  }
+
+  const getMovies = async (token) => {
+    try {
+      const response = await apiRequest('GET', '/movies', null, {
+        headers: { Authorization: `Bearer ${token}`}
+      })
+      setMovies(response.data)
+    } catch (error) {
+      setError(error)
+    }
   }
 
   useEffect(() => {
@@ -35,12 +49,12 @@ function MainView(){
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await apiRequest('GET', '/movies')
-        setMovies(response)
-      } catch (error) {
-        setError(error)
-      }
+      // try {
+      //   const response = await apiRequest('GET', '/movies')
+      //   setMovies(response.data)
+      // } catch (error) {
+      //   setError(error)
+      // }
     }
     fetchData()
   },[])
