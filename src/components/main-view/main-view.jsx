@@ -18,19 +18,30 @@ function MainView(){
   const [ error, setError ] = useState(false)
   const [ movies, setMovies ] = useState([])
   const [ user, setUser ] = useState(null)
+  const [ userDetails, setUserDetails ] = useState({})
 
   /* When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
   const onLoggedIn = authData => {
     setUser(authData.data.Username)
     localStorage.setItem('token', authData.token);
     localStorage.setItem('user', authData.data.Username);
-    getMovies(authData.token);
+    getMovies();
+    getUserDetails(authData.data.Username, authData.token)
   }
 
-  const getMovies = async (token) => {
+  const getMovies = async () => {
     try {
-      const response = await apiRequest('GET', '/movies', null, token)
+      const response = await apiRequest('GET', '/movies')
       setMovies(response.data)
+    } catch (error) {
+      setError(error)
+    }
+  }
+
+  const getUserDetails = async (name) => {
+    try {
+      const response = await apiRequest('GET', `/users/${name}`)
+      setUserDetails(response.data)
     } catch (error) {
       setError(error)
     }
@@ -53,7 +64,8 @@ function MainView(){
       const accessToken = localStorage.getItem('token');
       if (accessToken !== null) {
         setUser(localStorage.getItem('user'));
-        getMovies(accessToken);
+        getMovies();
+        getUserDetails(localStorage.getItem('user'))
       }
     }
     getData()
