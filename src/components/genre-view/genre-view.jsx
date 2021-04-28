@@ -2,7 +2,6 @@ import React from 'react'
 import { Row, Col, Button } from 'react-bootstrap'
 
 import './genre-view.scss'
-
 function GenreView(props){
   const { genre, onBackButton } = props
   return (
