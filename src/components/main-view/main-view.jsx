@@ -96,12 +96,12 @@ function MainView(){
           </Col>
           )
         }}/>
-        <Route path="/director/:name" render={() => {
+        <Route path="/director/:name" render={({ match, history }) => {
           if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (
             <Col>
-              <DirectorView />
+              <DirectorView director={movies.find(movie => movie.Director.Name === match.params.name).Director}  onBackButton={() => history.goBack()} />
             </Col>
           )
         }} />
