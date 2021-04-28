@@ -7,7 +7,7 @@ import useRequest from '../../hooks/useRequest'
 import './registration-view.scss'
 
 function RegistrationView(props) {
-  const { setRegister, onSignUp } = props
+  const { onSignUp } = props
   const apiRequest = useRequest()
   const [ loading, setLoading ] = useState(false)
   const [ error, setError ] = useState(false)
@@ -111,7 +111,6 @@ function RegistrationView(props) {
 
 RegistrationView.propTypes = {
   onSignUp: PropTypes.func.isRequired,
-  setRegister: PropTypes.func.isRequired
 };
 
 export default RegistrationView

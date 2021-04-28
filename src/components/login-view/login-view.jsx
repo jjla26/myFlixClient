@@ -7,7 +7,7 @@ import useRequest from '../../hooks/useRequest'
 import './login-view.scss'
 
 function LoginView(props) {
-  const { setRegister, onLoggedIn } = props
+  const { onLoggedIn } = props
   const apiRequest = useRequest()
   const [ loading, setLoading ] = useState(false)
   const [ error, setError ] = useState(false)
@@ -75,7 +75,6 @@ function LoginView(props) {
 
 LoginView.propTypes = {
   onLoggedIn: PropTypes.func.isRequired,
-  setRegister: PropTypes.func.isRequired
 };
 
 export default LoginView
