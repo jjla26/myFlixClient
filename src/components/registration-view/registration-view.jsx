@@ -8,6 +8,7 @@ import useRequest from '../../hooks/useRequest'
 import './registration-view.scss'
 
 function RegistrationView(props) {
+  const { setMessage } = props
   const history = useHistory()
   const apiRequest = useRequest()
   const [ loading, setLoading ] = useState(false)
@@ -29,6 +30,7 @@ function RegistrationView(props) {
         Birthday: birthday 
       }) 
       setLoading(false)
+      setMessage("Great! Now you can log in")
       history.push('/')
     } catch (error) {
       setLoading(false)

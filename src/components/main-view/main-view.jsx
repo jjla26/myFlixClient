@@ -16,6 +16,7 @@ import './main-view.scss'
 function MainView(){
   const apiRequest = useRequest()
   const [ error, setError ] = useState(false)
+  const [ message, setMessage ] = useState(false)
   const [ movies, setMovies ] = useState([])
   const [ user, setUser ] = useState(null)
   const [ userDetails, setUserDetails ] = useState({})
@@ -27,6 +28,7 @@ function MainView(){
     localStorage.setItem('user', authData.data.Username);
     getMovies();
     getUserDetails(authData.data.Username, authData.token)
+    setMessage("You have logged in successfully")
   }
 
   const getMovies = async () => {
@@ -51,12 +53,14 @@ function MainView(){
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
+    setMessage("You have logged out successfully  ")
   }
 
   const onAddFavorite = async movie => {
     try {
       const response = await apiRequest('POST', `/users/${user}/favorites/${movie}`)
       setUserDetails(response.data)
+      setMessage(response.message)
     } catch (error) {
       setError(error)
     }
@@ -65,6 +69,7 @@ function MainView(){
     try {
       const response = await apiRequest('DELETE', `/users/${user}/favorites/${movie}`)
       setUserDetails(response.data)
+      setMessage(response.message)
     } catch (error) {
       setError(error)
     }
@@ -75,6 +80,12 @@ function MainView(){
       setTimeout(() => setError(null), 3000)
     }
   },[error])
+
+  useEffect(() => {
+    if(message){
+      setTimeout(() => setMessage(null), 3000)
+    }
+  },[message])
 
   useEffect(() => {
     const getData = async () => {
@@ -110,7 +121,7 @@ function MainView(){
           if (user) return <Redirect to="/" />
           return (
             <Col>
-              <RegistrationView />
+              <RegistrationView setMessage={setMessage} />
             </Col>
           )
         }} />
@@ -199,7 +210,8 @@ function MainView(){
           )
         }} />
       </Row>
-      <Alert show={!!error} className="error-message" variant="primary">{error}</Alert>
+      <Alert show={!!error} className="error-message" variant="secondary">{error}</Alert>
+      <Alert show={!!message} className="success-message" variant="primary">{message}</Alert>
     </Router>
   );
 };
