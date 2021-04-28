@@ -1,23 +1,23 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
-import { Card, Button, ListGroup } from 'react-bootstrap'
+import { Card } from 'react-bootstrap'
+import { useHistory } from 'react-router-dom'
 
 import './movie-card.scss'
 
-class MovieCard extends Component {
-  render() {
-    const { movie, onMovieClick } = this.props  
-    return (
-      <Card className="movie-card" onClick={() => onMovieClick(movie)}>
-        <Card.Img src={movie.ImagePath} />
-        <Card.Body>
-          <Card.Text>
-            {movie.Title}
-          </Card.Text>
-        </Card.Body>
-      </Card>
-    )
-  }
+function MovieCard(props){
+  const history = useHistory()
+  const { movie } = props  
+  return (
+    <Card className="movie-card" onClick={() => history.push(`/movies/${movie._id}`)}>
+      <Card.Img src={movie.ImagePath} />
+      <Card.Body>
+        <Card.Text>
+          {movie.Title}
+        </Card.Text>
+      </Card.Body>
+    </Card>
+  )
 };
 
 MovieCard.propTypes = {
@@ -28,7 +28,6 @@ MovieCard.propTypes = {
     }),
     ImagePath: PropTypes.string.isRequired 
   }).isRequired,
-  onMovieClick: PropTypes.func.isRequired
 };
 
 export default MovieCard;
