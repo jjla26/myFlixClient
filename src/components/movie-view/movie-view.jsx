@@ -1,13 +1,14 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types';
 import { Row, Col, Image, Button } from 'react-bootstrap'
 import { usePalette } from 'react-palette'
+import { Link } from 'react-router-dom'
 
 import './movie-view.scss'
 
 const styles = {
   movieView: (color) => ({
-    backgroundImage: `linear-gradient(170deg, ${color}, transparent)`
+    backgroundImage: `linear-gradient(90deg, transparent, ${color}, transparent)`
   })
 }
 
@@ -16,37 +17,37 @@ function MovieView(props){
   const { data, loading, error } = usePalette(movie.ImagePath)
 
   return (
-    <Row className="movie-view" style={styles.movieView(data.vibrant)}>
-      <Col md={4} className="d-flex justify-content-center align-items-start">
+    <Row className="movie-view">
+      <Col md={4} className="d-flex justify-content-center align-items-center" style={styles.movieView(data.vibrant)}>
          <Image className="movie-view__image" src={movie.ImagePath} />
       </Col>
-      <Col md={8} className="d-flex flex-column justify-content-start">
-        <Row>
-          <Col>
+      <Col md={8} className="d-flex flex-column justify-content-center align-items-center">
+        <Row p={5}>
+          <Col className="m-2">
             Title: {movie.Title}
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col className="m-2">
+            <span className="label">Genre: </span>
+            <span className="value"><Link to={`/genre/${movie.Genre.Name}`}>{movie.Genre.Name}</Link></span>
+          </Col>
+        </Row>
+        <Row>
+          <Col className="m-2">
+            <span className="label">Director: </span>
+            <span className="value"><Link to={`/director/${movie.Director.Name}`}>{movie.Director.Name}</Link></span>
+          </Col>
+        </Row>
+        <Row>
+          <Col className="m-2">
             <span className="label">Description: </span>
             <span className="value">{movie.Description}</span>
           </Col>
         </Row>
         <Row>
           <Col>
-            <span className="label">Genre: </span>
-            <span className="value">{movie.Genre?.Name}</span>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <span className="label">Director: </span>
-            <span className="value">{movie.Director?.Name}</span>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Button onClick={() => onBackButton(null)}>Back</Button>
+            <Button onClick={onBackButton}>Back</Button>
           </Col>
         </Row>
       </Col>
