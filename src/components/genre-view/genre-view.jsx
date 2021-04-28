@@ -6,8 +6,8 @@ import './genre-view.scss'
 function GenreView(props){
   const { genre, onBackButton } = props
   return (
-    <Row className="genre-view">
-      <Col md={12} className="d-flex flex-column justify-content-center align-items-center">
+    <Row className="genre-view d-flex flex-column justify-content-center align-items-center">
+      <Col md={10} className="d-flex flex-column justify-content-center align-items-center">
         <Row p={5}>
           <Col className="m-2">
             Name: {genre.Name}
