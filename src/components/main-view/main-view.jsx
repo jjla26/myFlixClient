@@ -102,6 +102,16 @@ function MainView(){
           return (
             <Col>
               <DirectorView director={movies.find(movie => movie.Director.Name === match.params.name).Director}  onBackButton={() => history.goBack()} />
+              <Row className="d-flex justify-content-center">
+                <h4>{match.params.name}'s Movies</h4>
+              </Row>
+              <Row className="d-flex justify-content-center">
+                {movies.filter(movie => movie.Director.Name === match.params.name).map(movie => 
+                  <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
+                    <MovieCard movie={movie} />
+                  </Col>)
+                }
+              </Row>
             </Col>
           )
         }} />
@@ -111,6 +121,16 @@ function MainView(){
           return (
             <Col>
               <GenreView genre={movies.find(movie => movie.Genre.Name === match.params.name).Genre} onBackButton={() => history.goBack()} />
+              <Row className="d-flex justify-content-center">
+                <h4>{match.params.name} Movies</h4>
+              </Row>
+              <Row className="d-flex justify-content-center">
+                {movies.filter(movie => movie.Genre.Name === match.params.name).map(movie => 
+                  <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
+                    <MovieCard movie={movie} />
+                  </Col>)
+                }
+              </Row>
             </Col>
           )
         }} />
