@@ -21,9 +21,9 @@ function MainView(){
 
   /* When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
   const onLoggedIn = authData => {
-    setUser(authData.data)
+    setUser(authData.data.Username)
     localStorage.setItem('token', authData.token);
-    localStorage.setItem('user', JSON.stringify(authData.data));
+    localStorage.setItem('user', authData.data.Username);
     getMovies(authData.token);
   }
 
@@ -46,7 +46,7 @@ function MainView(){
     const getData = async () => {
       const accessToken = localStorage.getItem('token');
       if (accessToken !== null) {
-        setUser(JSON.parse(localStorage.getItem('user')));
+        setUser(localStorage.getItem('user'));
         getMovies(accessToken);
       }
     }
