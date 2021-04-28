@@ -53,6 +53,23 @@ function MainView(){
     setUser(null);
   }
 
+  const onAddFavorite = async movie => {
+    try {
+      const response = await apiRequest('POST', `/users/${user}/favorites/${movie}`)
+      setUserDetails(response.data)
+    } catch (error) {
+      setError(error)
+    }
+  } 
+  const onDeleteFavorite = async movie => {
+    try {
+      const response = await apiRequest('DELETE', `/users/${user}/favorites/${movie}`)
+      setUserDetails(response.data)
+    } catch (error) {
+      setError(error)
+    }
+  }
+
   useEffect(() => {
     if(error){
       setTimeout(() => setError(null), 3000)
@@ -98,8 +115,8 @@ function MainView(){
           )
         }} />
         <Route path="/myfavorites" render={() => {
-          if(!user) return <Redirect to="/" />
           if (movies.length === 0) return <div className="main-view" />;
+          if(!user) return <Redirect to="/" />
 
           return (
             <Col>
@@ -107,34 +124,45 @@ function MainView(){
                 <h4>My List of Favorites Movies</h4>
               </Row>
               <Row>
-                {movies.filter(movie => userDetails.FavoriteMovies.find(fav => fav === movie._id)).map(movie => 
+                {userDetails.FavoriteMovies && userDetails.FavoriteMovies.length > 0 ? 
+                movies.filter(movie => userDetails.FavoriteMovies && userDetails.FavoriteMovies.find(fav => fav === movie._id)).map(movie => 
                   <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
                     <MovieCard movie={movie} />
-                  </Col>)}
+                  </Col>)
+                : 
+                <Col className="d-flex justify-content-center p-5">
+                  <h6>Add movies to your favorites</h6>
+                </Col>
+                }
               </Row>
             </Col>
           )
         }} />
-        <Route path="/profile/:name" render={({ match }) => {
-          if(!user) return <Redirect to="/" />
+        <Route path="/profile" render={() => {
           if (movies.length === 0) return <div className="main-view" />;
+          if(!user) return <Redirect to="/" />
           return (
             <Col>
-              <ProfileView user={match.params.name} />
+              <ProfileView userDetails={userDetails} />
             </Col>
           )
         }} />
         <Route path="/movies/:movieId" render={({ match, history }) => {
-          if(!user) return <Redirect to="/" />
           if (movies.length === 0) return <div className="main-view" />;
+          if(!user) return <Redirect to="/" />
           return (<Col>
-            <MovieView movie={movies.find(movie => movie._id === match.params.movieId)} onBackButton={() => history.goBack()} />
+            <MovieView 
+              movie={movies.find(movie => movie._id === match.params.movieId)} 
+              favorite={userDetails.FavoriteMovies && userDetails.FavoriteMovies.find(movie => movie === match.params.movieId )} 
+              onAddFavorite={onAddFavorite}
+              onDeleteFavorite={onDeleteFavorite}
+              onBackButton={() => history.goBack()} />
           </Col>
           )
         }}/>
         <Route path="/director/:name" render={({ match, history }) => {
-          if(!user) return <Redirect to="/" />
           if (movies.length === 0) return <div className="main-view" />;
+          if(!user) return <Redirect to="/" />
           return (
             <Col>
               <DirectorView director={movies.find(movie => movie.Director.Name === match.params.name).Director}  onBackButton={() => history.goBack()} />
@@ -152,8 +180,8 @@ function MainView(){
           )
         }} />
         <Route path="/genre/:name" render={({ match, history }) => {
-          if(!user) return <Redirect to="/" />
           if (movies.length === 0) return <div className="main-view" />;
+          if(!user) return <Redirect to="/" />
           return (
             <Col>
               <GenreView genre={movies.find(movie => movie.Genre.Name === match.params.name).Genre} onBackButton={() => history.goBack()} />

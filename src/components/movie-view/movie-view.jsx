@@ -13,8 +13,8 @@ const styles = {
 }
 
 function MovieView(props){
-  const { movie, onBackButton } = props
-  const { data, loading, error } = usePalette(movie.ImagePath)
+  const { movie, onBackButton, favorite, onAddFavorite, onDeleteFavorite } = props
+  const { data } = usePalette(movie.ImagePath)
 
   return (
     <Row className="movie-view">
@@ -47,7 +47,12 @@ function MovieView(props){
         </Row>
         <Row>
           <Col>
-            <Button onClick={onBackButton}>Back</Button>
+            <Button onClick={onBackButton} className="m-2">Back</Button>
+            {favorite ? 
+            <Button onClick={() => onDeleteFavorite(movie._id)} className="m-2">Delete From Favorites</Button>
+            :
+            <Button onClick={() => onAddFavorite(movie._id)} className="m-2">Add to Favorites</Button>
+            }
           </Col>
         </Row>
       </Col>
