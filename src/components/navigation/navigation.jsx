@@ -15,7 +15,7 @@ function Navigation(props) {
           <Nav.Link as={Link} to='/myfavorites'>Favorites</Nav.Link>
         </Nav>
         <Nav>
-          <Nav.Link as={Link} to='/profile'>{user.Username}'s Profile</Nav.Link>
+          <Nav.Link as={Link} to='/profile'>{user}'s Profile</Nav.Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>
