@@ -17,7 +17,6 @@ function MainView(){
   const apiRequest = useRequest()
   const [ error, setError ] = useState(false)
   const [ movies, setMovies ] = useState([])
-  const [ selectedMovie, setSelectedMovie ] = useState(null)
   const [ user, setUser ] = useState(null)
 
   /* When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
@@ -58,7 +57,7 @@ function MainView(){
   if (movies.length === 0) renderMovies = <div className="main-view"></div>; // Rendering movies just if there are movies
   else renderMovies = movies.map(movie => 
     <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
-      <MovieCard movie={movie} onMovieClick={movie => setSelectedMovie(movie)} />
+      <MovieCard movie={movie} />
     </Col>
     )
 
@@ -68,6 +67,7 @@ function MainView(){
       <Row className="main-view d-flex justify-content-md-center">
 
         <Route exact={true} path="/" render={() => {
+          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Col><LoginView onLoggedIn={user => onLoggedIn(user)} /></Col>
           return renderMovies
         }}/>
@@ -80,6 +80,7 @@ function MainView(){
           )
         }} />
         <Route path="/profile" render={() => {
+          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (
             <Col>
@@ -87,14 +88,16 @@ function MainView(){
             </Col>
           )
         }} />
-        <Route path="/movies/:movieId" render={() => {
+        <Route path="/movies/:movieId" render={({ match, history }) => {
+          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (<Col>
-            <MovieView movie={selectedMovie} onBackButton={movie => setSelectedMovie(movie)} />
+            <MovieView movie={movies.find(movie => movie._id === match.params.movieId)} onBackButton={() => history.goBack()} />
           </Col>
           )
         }}/>
         <Route path="/director/:name" render={() => {
+          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (
             <Col>
@@ -103,6 +106,7 @@ function MainView(){
           )
         }} />
         <Route path="/genre/:name" render={() => {
+          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (
             <Col>
