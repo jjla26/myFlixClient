@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios';
-import { Container, Row, Col, Spinner, Alert } from 'react-bootstrap'
+import { Row, Col, Alert } from 'react-bootstrap'
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import Navbar from '../navigation/navigation';
 import LoginView from '../login-view/login-view';
 import MovieCard from '../movie-card/movie-card';
+import DirectorView from '../director-view/director-view';
+import GenreView from '../genre-view/genre-view';
 import MovieView from '../movie-view/movie-view';
+import ProfileView from '../profile-view/profile-view';
 import RegistrationView from '../registration-view/registration-view';
 import useRequest from '../../hooks/useRequest'
 import './main-view.scss'
@@ -22,7 +25,7 @@ function MainView(){
   const onLoggedIn = authData => {
     setUser(authData.data)
     localStorage.setItem('token', authData.token);
-    localStorage.setItem('user', authData.data.Username);
+    localStorage.setItem('user', JSON.stringify(authData.data));
     getMovies(authData.token);
   }
 
@@ -32,9 +35,7 @@ function MainView(){
 
   const getMovies = async (token) => {
     try {
-      const response = await apiRequest('GET', '/movies', null, {
-        headers: { Authorization: `Bearer ${token}`}
-      })
+      const response = await apiRequest('GET', '/movies', null, token)
       setMovies(response.data)
     } catch (error) {
       setError(error)
@@ -48,20 +49,15 @@ function MainView(){
   },[error])
 
   useEffect(() => {
-    const fetchData = async () => {
-      // try {
-      //   const response = await apiRequest('GET', '/movies')
-      //   setMovies(response.data)
-      // } catch (error) {
-      //   setError(error)
-      // }
+    const getData = async () => {
+      const accessToken = localStorage.getItem('token');
+      if (accessToken !== null) {
+        setUser(JSON.parse(localStorage.getItem('user')));
+        getMovies(accessToken);
+      }
     }
-    fetchData()
+    getData()
   },[])
-
-  if(register) return <RegistrationView setRegister={register => setRegister(register)} onSignUp={user => onSignUp(user)} />
-  /* If there is no user, the LoginView is rendered. If there is a user logged in, the user details are *passed as a prop to the LoginView*/
-  if (!user) return <LoginView setRegister={register => setRegister(register)} onLoggedIn={user => onLoggedIn(user)} />;
 
   let renderMovies
   if (movies.length === 0) renderMovies = <div className="main-view"></div>; // Rendering movies just if there are movies
@@ -72,19 +68,47 @@ function MainView(){
     )
 
   return (
-    <>
-      <Navbar user={user}/>
-      <Row className="main-view d-flex justify-content-md-center">
-          {selectedMovie ?
+    <Router>
+      {user && <Navbar user={user}/>}
+      <Route exact={true} path="/" render={() => {
+        if(!user) return <LoginView onLoggedIn={user => onLoggedIn(user)} />
+        else return renderMovies
+      }}/>
+      <Route path="/register" render={() => {
+        return (
+          <Col>
+            <RegistrationView onSignUp={user => onSignUp(user)} />
+          </Col>
+        )
+      }} />
+      <Route path="/profile" render={() => {
+        return (
+          <Col>
+            <ProfileView />
+          </Col>
+        )
+      }} />
+      <Route path="/movies/:movieId" render={() => {
             <Col>
               <MovieView movie={selectedMovie} onBackButton={movie => setSelectedMovie(movie)} />
             </Col>
-          : 
-            renderMovies
-          }
-      </Row>
+      }}/>
+      <Route path="/director/:name" render={() => {
+        return (
+          <Col>
+            <DirectorView />
+          </Col>
+        )
+      }} />
+      <Route path="/genre/:name" render={() => {
+        return (
+          <Col>
+            <GenreView />
+          </Col>
+        )
+      }} />
       <Alert show={!!error} className="error-message" variant="primary">{error}</Alert>
-    </>
+    </Router>
   );
 };
 
