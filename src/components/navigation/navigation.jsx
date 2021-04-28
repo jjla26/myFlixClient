@@ -1,10 +1,10 @@
 import React from 'react'
-import { Navbar, Nav } from 'react-bootstrap'
+import { Navbar, Nav, NavDropdown } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import './navigation.scss'
 
 function Navigation(props) {
-  const { user } = props
+  const { user, onLoggedOut } = props
   return (
     <Navbar className="navigation" collapseOnSelect expand="lg" bg="secondary" variant="primary" sticky="top">
       <Navbar.Brand as={Link} to='/'>MYFLIX APP</Navbar.Brand>
@@ -15,7 +15,11 @@ function Navigation(props) {
           <Nav.Link as={Link} to='/myfavorites'>Favorites</Nav.Link>
         </Nav>
         <Nav>
-          <Nav.Link as={Link} to='/profile'>{user}'s Profile</Nav.Link>
+          <NavDropdown title={`${user}'s Profile`} id="basic-nav-dropdown">
+          <NavDropdown.Item as={Link} to={`/profile/${user}`}>My Profile</NavDropdown.Item>
+          <NavDropdown.Divider />
+          <NavDropdown.Item onClick={onLoggedOut}>Log Out</NavDropdown.Item>
+          </NavDropdown>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

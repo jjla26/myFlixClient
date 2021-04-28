@@ -36,6 +36,12 @@ function MainView(){
     }
   }
 
+  const onLoggedOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  }
+
   useEffect(() => {
     if(error){
       setTimeout(() => setError(null), 3000)
@@ -63,12 +69,12 @@ function MainView(){
 
   return (
     <Router>
-      {user && <Navbar user={user}/>}
+      {user && <Navbar user={user} onLoggedOut={onLoggedOut}/>}
       <Row className="main-view d-flex justify-content-md-center">
 
         <Route exact={true} path="/" render={() => {
-          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Col><LoginView onLoggedIn={user => onLoggedIn(user)} /></Col>
+          if (movies.length === 0) return <div className="main-view" />;
           return renderMovies
         }}/>
         <Route path="/register" render={() => {
@@ -79,12 +85,12 @@ function MainView(){
             </Col>
           )
         }} />
-        <Route path="/profile" render={() => {
+        <Route path="/profile/:name" render={({ match }) => {
           if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (
             <Col>
-              <ProfileView />
+              <ProfileView user={match.params.name} />
             </Col>
           )
         }} />
