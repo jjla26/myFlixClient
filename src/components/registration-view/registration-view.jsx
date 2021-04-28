@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill, Calendar2DateFill } from 'react-bootstrap-icons'
-import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import useRequest from '../../hooks/useRequest'
 import './registration-view.scss'
 
 function RegistrationView(props) {
-  const history = useHistory()
   const { onSignUp } = props
   const apiRequest = useRequest()
   const [ loading, setLoading ] = useState(false)
@@ -102,7 +101,7 @@ function RegistrationView(props) {
               </Button>}
             </Form>
           </Card.Body>
-          {!loading &&<Card.Footer>Do you have an account? <a href="#" onClick={() => history.push('/')}>Sign In</a></Card.Footer>}
+          {!loading &&<Card.Footer>Do you have an account? <Link to='/'>Sign In</Link></Card.Footer>}
         </Card>
       </Col>
       <Alert show={!!error} className="error-message" variant="primary">{error}</Alert>
