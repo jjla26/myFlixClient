@@ -1,0 +1,19 @@
+@import '../../index.scss';
+
+
+.profile-view{
+  min-height: calc(100vh - 56px);
+}
+.profile-details{
+  background-color: $secondary-lighter !important;
+}
+
+.profile-card__image{
+  width: 200px;
+  height: 200px;
+}
+
+.profile-card{
+  background-color: $secondary-lighter !important;
+  min-height: 300px;
+}
