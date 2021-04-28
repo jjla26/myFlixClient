@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill, Calendar2DateFill } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import useRequest from '../../hooks/useRequest'
 import './registration-view.scss'
 
 function RegistrationView(props) {
-  const { onSignUp } = props
+  const history = useHistory()
   const apiRequest = useRequest()
   const [ loading, setLoading ] = useState(false)
   const [ error, setError ] = useState(false)
@@ -29,7 +29,7 @@ function RegistrationView(props) {
         Birthday: birthday 
       }) 
       setLoading(false)
-      onSignUp()
+      history.push('/')
     } catch (error) {
       setLoading(false)
       setError(error)
@@ -108,9 +108,5 @@ function RegistrationView(props) {
     </Row>
   );
 }
-
-RegistrationView.propTypes = {
-  onSignUp: PropTypes.func.isRequired,
-};
 
 export default RegistrationView
