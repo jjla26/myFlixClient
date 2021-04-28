@@ -97,9 +97,27 @@ function MainView(){
             </Col>
           )
         }} />
-        <Route path="/profile/:name" render={({ match }) => {
-          if (movies.length === 0) return <div className="main-view" />;
+        <Route path="/myfavorites" render={() => {
           if(!user) return <Redirect to="/" />
+          if (movies.length === 0) return <div className="main-view" />;
+
+          return (
+            <Col>
+              <Row className="d-flex justify-content-center">
+                <h4>My List of Favorites Movies</h4>
+              </Row>
+              <Row>
+                {movies.filter(movie => userDetails.FavoriteMovies.find(fav => fav === movie._id)).map(movie => 
+                  <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
+                    <MovieCard movie={movie} />
+                  </Col>)}
+              </Row>
+            </Col>
+          )
+        }} />
+        <Route path="/profile/:name" render={({ match }) => {
+          if(!user) return <Redirect to="/" />
+          if (movies.length === 0) return <div className="main-view" />;
           return (
             <Col>
               <ProfileView user={match.params.name} />
@@ -107,16 +125,16 @@ function MainView(){
           )
         }} />
         <Route path="/movies/:movieId" render={({ match, history }) => {
-          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
+          if (movies.length === 0) return <div className="main-view" />;
           return (<Col>
             <MovieView movie={movies.find(movie => movie._id === match.params.movieId)} onBackButton={() => history.goBack()} />
           </Col>
           )
         }}/>
         <Route path="/director/:name" render={({ match, history }) => {
-          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
+          if (movies.length === 0) return <div className="main-view" />;
           return (
             <Col>
               <DirectorView director={movies.find(movie => movie.Director.Name === match.params.name).Director}  onBackButton={() => history.goBack()} />
@@ -134,8 +152,8 @@ function MainView(){
           )
         }} />
         <Route path="/genre/:name" render={({ match, history }) => {
-          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
+          if (movies.length === 0) return <div className="main-view" />;
           return (
             <Col>
               <GenreView genre={movies.find(movie => movie.Genre.Name === match.params.name).Genre} onBackButton={() => history.goBack()} />
