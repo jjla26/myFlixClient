@@ -4,6 +4,7 @@ $color: white;
 $color-secondary: black;
 $primary:#ffc312;
 $secondary: #231f20;
+$secondary-lighter: lighten($secondary, 5%);
 
 .my-flix {
   background-color: $secondary;
