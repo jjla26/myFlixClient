@@ -9,11 +9,23 @@
 }
 
 .profile-card__image{
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
 }
 
 .profile-card{
   background-color: $secondary-lighter !important;
   min-height: 300px;
+  padding: 20px
+}
+
+.update-card__prepend{
+  width: 50px;
+  background-color: $primary;
+  color: $color-secondary;
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  border-radius: 2px 0px 0px 2px; 
+
 }
