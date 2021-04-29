@@ -16,7 +16,7 @@ function Navigation(props) {
         </Nav>
         <Nav>
           <NavDropdown title={`${user}'s Profile`} id="basic-nav-dropdown">
-          <NavDropdown.Item as={Link} to={`/profile/${user}`}>My Profile</NavDropdown.Item>
+          <NavDropdown.Item as={Link} to={`/profile`}>My Profile</NavDropdown.Item>
           <NavDropdown.Divider />
           <NavDropdown.Item onClick={onLoggedOut}>Log Out</NavDropdown.Item>
           </NavDropdown>
