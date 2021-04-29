@@ -12,9 +12,8 @@ import moment from 'moment'
 
 function Profile(props){
   const apiRequest = useRequest()
-  const { userDetails, onLoggedOut, setUserDetails, setUser } = props
+  const { userDetails, onLoggedOut, setUserDetails, setUser, setMessage } = props
   const [ error, setError ] = useState(null)
-  const [ message, setMessage ] = useState(null)
   const [ loading, setLoading ] = useState(false)
   const [ showModal, setShowModal ] = useState(false) 
   const [ update, setUpdate ] = useState(false)
@@ -52,26 +51,6 @@ function Profile(props){
       setError(error)
     }
   }
-
-  useEffect(() => {
-    let timeout
-    if(error){
-      timeout = setTimeout(() => setError(null), 3000)
-    }
-    return () => {
-      clearTimeout(timeout)
-    }
-  },[error])
-
-  useEffect(() => {
-    let timeout
-    if(message){
-      timeout = setTimeout(() => setMessage(null), 3000)
-    }
-    return () => {
-      clearTimeout(timeout)
-    }
-  },[message])
 
   return (
     <Row className="profile-view d-flex justify-content-center align-items-center">
@@ -234,7 +213,6 @@ function Profile(props){
         show={showModal}
       />
       <Alert show={!!error} className="error-message" variant="secondary">{error}</Alert>
-      <Alert show={!!message} className="success-message" variant="secondary">{message}</Alert>
     </Row>
   )
 }

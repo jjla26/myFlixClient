@@ -86,6 +86,7 @@ function MainView(){
   },[error])
 
   useEffect(() => {
+    let timeout
     if(message){
       timeout = setTimeout(() => setMessage(null), 3000)
     }
@@ -161,7 +162,7 @@ function MainView(){
           if(!user) return <Redirect to="/" />
           return (
             <Col>
-              <ProfileView setUserDetails={setUserDetails} setUser={setUser} userDetails={userDetails} onLoggedOut={onLoggedOut}/>
+              <ProfileView setMessage={setMessage} setUserDetails={setUserDetails} setUser={setUser} userDetails={userDetails} onLoggedOut={onLoggedOut}/>
             </Col>
           )
         }} />
