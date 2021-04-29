@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
+import { Formik } from 'formik';
 
 import useRequest from '../../hooks/useRequest'
 import './login-view.scss'
@@ -12,14 +13,24 @@ function LoginView(props) {
   const apiRequest = useRequest()
   const [ loading, setLoading ] = useState(false)
   const [ error, setError ] = useState(false)
-  const [ username, setUsername ] = useState('');
-  const [ password, setPassword ] = useState('');
 
-  const handleSubmit = async e => {
-    e.preventDefault();
+  const validate = values => {
+    const errors = {}
+    if(!values.username.trim()){
+      errors.username = "Username is required"
+    }
+    if(!values.password){
+      errors.password = "Password is required"
+    }else if(values.password.length <6){
+      errors.password = "Password should be longer than 6 characters"
+    }
+    return errors
+  }
+
+  const handleSubmit = async (values) => {
     setLoading(true)
     try {
-      const response = await apiRequest('POST', '/login', {Username: username, Password: password}) 
+      const response = await apiRequest('POST', '/login', {Username: values.username, Password: values.password}) 
       setLoading(false)
       onLoggedIn(response)
     } catch (error) {
@@ -39,32 +50,71 @@ function LoginView(props) {
             Sign In
           </Card.Header>
           <Card.Body>
-            <Form>
-              <Form.Group controlId="formUsername">
-                <InputGroup>
-                  <InputGroup.Prepend className="login-card__prepend">
-                    <PersonFill />
-                  </InputGroup.Prepend>
-                  <Form.Control autoComplete="username" type="text" placeholder="username" value={username} onChange={e => setUsername(e.target.value)}  />
-                </InputGroup>
-              </Form.Group>
+            <Formik
+              validate={validate}
+              onSubmit={handleSubmit}
+              initialValues={{
+                username: '',
+                password: '',
+              }}
+            >
+              {({
+                handleSubmit,
+                handleChange,
+                handleBlur,
+                touched,
+                values,
+                errors,
+              }) => (
+              <Form>
+                <Form.Group controlId="formUsername">
+                  <InputGroup>
+                    <InputGroup.Prepend className="login-card__prepend">
+                      <PersonFill />
+                    </InputGroup.Prepend>
+                    <Form.Control 
+                      name="username" 
+                      isInvalid={touched.username && !!errors.username} 
+                      autoComplete="username" 
+                      type="text" 
+                      placeholder="username" 
+                      value={values.username} 
+                      onChange={handleChange} 
+                      onBlur={handleBlur} />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.username}
+                    </Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
 
-              <Form.Group controlId="formPassword">
-                <InputGroup className="mb-2">
-                  <InputGroup.Prepend className="login-card__prepend">
-                    <KeyFill />
-                  </InputGroup.Prepend>
-                  <Form.Control autoComplete="current-password" type="password" placeholder="password" value={password} onChange={e => setPassword(e.target.value)}/>
-                </InputGroup>
-              </Form.Group>
-              {loading ? 
-              <Spinner className="float-right" animation="grow" variant="primary"/>
-              :
-              <Button className="float-right" variant="primary" type="submit" onClick={handleSubmit}>
-                LogIn
-              </Button>
-              }
-            </Form>
+                <Form.Group controlId="formPassword">
+                  <InputGroup className="mb-2">
+                    <InputGroup.Prepend className="login-card__prepend">
+                      <KeyFill />
+                    </InputGroup.Prepend>
+                    <Form.Control 
+                      name="password" 
+                      isInvalid={touched.password && !!errors.password} 
+                      autoComplete="current-password" 
+                      type="password" 
+                      placeholder="password" 
+                      value={values.password} 
+                      onChange={handleChange} 
+                      onBlur={handleBlur} />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.password}
+                    </Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
+                {loading ? 
+                <Spinner className="float-right" animation="grow" variant="primary"/>
+                :
+                <Button className="float-right" variant="primary" type="submit" onClick={handleSubmit}>
+                  LogIn
+                </Button>
+                }
+              </Form>)}
+            </Formik>
           </Card.Body>
           {!loading && <Card.Footer>Don't you have an account? <Link to='/register'>Sign Up</Link></Card.Footer>}
         </Card>
