@@ -154,7 +154,7 @@ function MainView(){
           if(!user) return <Redirect to="/" />
           return (
             <Col>
-              <ProfileView userDetails={userDetails} />
+              <ProfileView userDetails={userDetails} onLoggedOut={onLoggedOut}/>
             </Col>
           )
         }} />
