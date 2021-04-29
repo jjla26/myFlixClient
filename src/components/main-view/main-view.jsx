@@ -76,14 +76,21 @@ function MainView(){
   }
 
   useEffect(() => {
+    let timeout
     if(error){
-      setTimeout(() => setError(null), 3000)
+      timeout = setTimeout(() => setError(null), 3000)
+    }
+    return () => {
+      clearTimeout(timeout)
     }
   },[error])
 
   useEffect(() => {
     if(message){
-      setTimeout(() => setMessage(null), 3000)
+      timeout = setTimeout(() => setMessage(null), 3000)
+    }
+    return () => {
+      clearTimeout(timeout)
     }
   },[message])
 
