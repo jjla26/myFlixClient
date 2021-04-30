@@ -3,6 +3,7 @@ import { Row, Col, Alert } from 'react-bootstrap'
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 
 import Navbar from '../navigation/navigation';
+import Footer from '../footer/footer';
 import LoginView from '../login-view/login-view';
 import MovieCard from '../movie-card/movie-card';
 import DirectorView from '../director-view/director-view';
@@ -218,6 +219,7 @@ function MainView(){
           )
         }} />
       </Row>
+      <Footer />
       <Alert show={!!error} className="error-message" variant="secondary">{error}</Alert>
       <Alert show={!!message} className="success-message" variant="primary">{message}</Alert>
     </Router>

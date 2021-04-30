@@ -1,0 +1,11 @@
+@import '../../index.scss';
+
+.footer {
+  background-color: $secondary-lighter;
+  color: $primary;
+  height: 40px;
+  position: fixed;
+  bottom: 0;
+  z-index: 99
+}
+

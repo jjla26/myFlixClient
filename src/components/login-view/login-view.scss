@@ -4,7 +4,7 @@
   background-image: url('../../img/movie.jpg');
   background-size: cover;
   background-repeat: no-repeat;
-  min-height: 100vh;
+  min-height: calc(100vh - 40px);
   .login-card {
     height: 370px;
     width: 400px;

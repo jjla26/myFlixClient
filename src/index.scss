@@ -16,11 +16,13 @@ $secondary-lighter: lighten($secondary, 5%);
 .error-message {
   position: fixed;
   bottom: 0;
-  right: 0
+  right: 0;
+  z-index: 1000
 }
 
 .success-message {
   position: fixed;
   bottom: 0;
-  right: 0
+  right: 0;
+  z-index: 1000
 }
