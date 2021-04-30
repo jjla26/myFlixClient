@@ -2,6 +2,8 @@ export default function Validation(values){
   const errors = {}
   if(!values.username.trim()){
     errors.username = "Username is required"
+  }else if(values.username.length < 5){
+    errors.username = "Username should be longer than 4 characters"
   }
   if(!values.email.trim()){
     errors.email = "Email is required"
