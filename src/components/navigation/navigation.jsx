@@ -1,6 +1,8 @@
 import React from 'react'
 import { Navbar, Nav, NavDropdown } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+
+import VisibilityFilterInput from '../visibility-filter-input/visibility-filter-input';
 import './navigation.scss'
 
 function Navigation(props) {
@@ -15,6 +17,7 @@ function Navigation(props) {
           <Nav.Link as={Link} to='/myfavorites'>Favorites</Nav.Link>
         </Nav>
         <Nav>
+          <VisibilityFilterInput  />
           <NavDropdown title={`${user}'s Profile`} id="basic-nav-dropdown">
           <NavDropdown.Item as={Link} to={`/profile`}>My Profile</NavDropdown.Item>
           <NavDropdown.Divider />
