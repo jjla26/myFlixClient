@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill, Calendar2DateFill } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
 import { Formik } from 'formik';
 
-import { setError } from '../../redux/actions/actions'
+import { setError, setMessage } from '../../redux/actions/actions'
 import Validation from '../../utils/registerValidation'
 import useRequest from '../../hooks/useRequest'
 import './registration-view.scss'
 
 function RegistrationView(props) {
   const dispatch = useDispatch()
-  const { setMessage } = props
   const history = useHistory()
   const apiRequest = useRequest()
   const [ loading, setLoading ] = useState(false)
-  const error = useSelector(state => state.error)
 
   const handleSubmit = async values => {
     setLoading(true)
@@ -29,7 +27,7 @@ function RegistrationView(props) {
         Birthday: values.birthday 
       }) 
       setLoading(false)
-      setMessage("Great! Now you can log in")
+      dispatch(setMessage("Great! Now you can log in"))
       history.push('/')
     } catch (error) {
       setLoading(false)
@@ -168,7 +166,6 @@ function RegistrationView(props) {
           {!loading &&<Card.Footer>Do you have an account? <Link to='/'>Sign In</Link></Card.Footer>}
         </Card>
       </Col>
-      <Alert show={!!error} className="error-message" variant="primary">{error}</Alert>
     </Row>
   );
 }

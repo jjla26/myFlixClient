@@ -15,7 +15,6 @@ function LoginView(props) {
   const { onLoggedIn } = props
   const apiRequest = useRequest()
   const [ loading, setLoading ] = useState(false)
-  const error = useSelector(state => state.error)
 
   const validate = values => {
     const errors = {}
@@ -38,7 +37,6 @@ function LoginView(props) {
       onLoggedIn(response)
     } catch (error) {
       setLoading(false)
-      console.log(error)
       dispatch(setError(error))
     }
   };
@@ -123,7 +121,6 @@ function LoginView(props) {
           {!loading && <Card.Footer>Don't you have an account? <Link to='/register'>Sign Up</Link></Card.Footer>}
         </Card>
       </Col>
-      <Alert show={!!error} className="error-message" variant="primary">{error}</Alert>
     </Row>
   );
 }
