@@ -1,6 +1,4 @@
 node_modules
-dist/*
-!dist/.gitkeep
 .parcel-cache
 .cache
 .DS_Store
