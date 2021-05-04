@@ -32,7 +32,7 @@ function MainView(){
     localStorage.setItem('user', authData.data.Username);
     getMovies();
     getUserDetails(authData.data.Username, authData.token)
-    setMessage("You have logged in successfully")
+    dispatch(setMessage("You have logged in successfully"))
   }
 
   const getMovies = async () => {
@@ -40,7 +40,7 @@ function MainView(){
       const response = await apiRequest('GET', '/movies')
       dispatch(setMovies(response.data))
     } catch (error) {
-      setError(error)
+      dispatch(setError(error))
     }
   }
 
@@ -49,7 +49,7 @@ function MainView(){
       const response = await apiRequest('GET', `/users/${name}`)
       dispatch(setUserDetails(response.data))
     } catch (error) {
-      setError(error)
+      dispatch(setError(error))
     }
   }
 
@@ -57,14 +57,14 @@ function MainView(){
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     dispatch(setUser(null));
-    setMessage("You have logged out successfully  ")
+    dispatch(setMessage("You have logged out successfully  "))
   }
 
   const onAddFavorite = async movie => {
     try {
       const response = await apiRequest('POST', `/users/${user}/favorites/${movie}`)
       dispatch(setUserDetails(response.data));
-      setMessage(response.message)
+      dispatch(setMessage(response.message))
     } catch (error) {
       setError(error)
     }
@@ -73,16 +73,16 @@ function MainView(){
     try {
       const response = await apiRequest('DELETE', `/users/${user}/favorites/${movie}`)
       dispatch(setUserDetails(response.data))
-      setMessage(response.message)
+      dispatch(setMessage(response.message))
     } catch (error) {
-      setError(error)
+      dispatch(setError(error))
     }
   }
 
   useEffect(() => {
     let timeout
     if(error){
-      timeout = setTimeout(() => setError(null), 3000)
+      timeout = setTimeout(() => dispatch(setError(null)), 3000)
     }
     return () => {
       clearTimeout(timeout)
@@ -92,7 +92,7 @@ function MainView(){
   useEffect(() => {
     let timeout
     if(message){
-      timeout = setTimeout(() => setMessage(null), 3000)
+      timeout = setTimeout(() => dispatch(setMessage(null)), 3000)
     }
     return () => {
       clearTimeout(timeout)
@@ -128,7 +128,7 @@ function MainView(){
           if (user) return <Redirect to="/" />
           return (
             <Col>
-              <RegistrationView setMessage={setMessage} />
+              <RegistrationView />
             </Col>
           )
         }} />
@@ -156,7 +156,7 @@ function MainView(){
           if(!user) return <Redirect to="/" />
           return (
             <Col>
-              <ProfileView setMessage={setMessage} setUserDetails={setUserDetails} setUser={setUser} userDetails={userDetails} onLoggedOut={onLoggedOut}/>
+              <ProfileView onLoggedOut={onLoggedOut}/>
             </Col>
           )
         }} />
