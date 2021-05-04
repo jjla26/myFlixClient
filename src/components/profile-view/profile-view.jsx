@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Card, Row, Col, ListGroup, Button, Spinner, Alert, Form, InputGroup } from 'react-bootstrap'
 import { PersonFill, KeyFill, Calendar2DateFill } from 'react-bootstrap-icons'
 import { Formik } from 'formik'
+import PropTypes from 'prop-types';
 
 import { setError, setMessage, setUserDetails, setUser } from '../../redux/actions/actions'
 import useRequest from '../../hooks/useRequest' 
@@ -218,5 +219,9 @@ function Profile(props){
     </Row>
   )
 }
+
+Profile.propTypes = {
+  onLoggedOut: PropTypes.func.isRequired,
+};
 
 export default Profile

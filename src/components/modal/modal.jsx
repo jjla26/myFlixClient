@@ -1,7 +1,8 @@
 import React from 'react'
 import { Modal, Button } from 'react-bootstrap'
+import PropTypes from 'prop-types';
 
-export default function CustomModal(props) {
+function CustomModal(props) {
   const { title, body, action, button, show, handleClose} = props
 
   return (
@@ -21,3 +22,14 @@ export default function CustomModal(props) {
     </Modal>
   )
 }
+
+CustomModal.propTypes = {
+  title: PropTypes.string.isRequired,
+  body: PropTypes.string.isRequired,
+  action: PropTypes.func.isRequired,
+  button: PropTypes.string.isRequired,
+  show: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
+};
+
+export default CustomModal

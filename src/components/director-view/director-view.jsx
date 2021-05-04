@@ -1,7 +1,9 @@
 import React from 'react'
 import { Row, Col, Button} from 'react-bootstrap'
+import PropTypes from 'prop-types';
 
 import './director-view.scss'
+import moment from 'moment'
 
 function DirectorView(props){
   const { director, onBackButton } = props
@@ -15,7 +17,7 @@ function DirectorView(props){
         </Row>
         <Row>
           <Col className="m-2">
-            Birthdate: {director?.Birth}
+            Birthdate: {moment(director?.Birth).format('DD-MM-YYYY')}
           </Col>
         </Row>
         <Row>
@@ -32,5 +34,14 @@ function DirectorView(props){
     </Row>
   )
 }
+
+DirectorView.propTypes = {
+  director: PropTypes.shape({
+    Name: PropTypes.string.isRequired,
+    Birth: PropTypes.string.isRequired,
+    Bio: PropTypes.string.isRequired
+  }),  
+  onBackButton: PropTypes.func.isRequired,
+};
 
 export default DirectorView

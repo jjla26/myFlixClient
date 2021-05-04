@@ -1,5 +1,7 @@
 import React from 'react'
 import { Row, Col, Button } from 'react-bootstrap'
+import PropTypes from 'prop-types';
+
 
 import './genre-view.scss'
 function GenreView(props){
@@ -26,5 +28,13 @@ function GenreView(props){
     </Row>
   )
 }
+
+GenreView.propTypes = {
+  genre: PropTypes.shape({
+    Name: PropTypes.string.isRequired,
+    Description: PropTypes.string.isRequired
+  }),
+  onBackButton: PropTypes.func.isRequired,
+};
 
 export default GenreView

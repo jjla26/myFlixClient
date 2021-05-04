@@ -1,6 +1,7 @@
 import React from 'react'
 import { Navbar, Nav, NavDropdown } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import PropTypes from 'prop-types';
 
 import VisibilityFilterInput from '../visibility-filter-input/visibility-filter-input';
 import './navigation.scss'
@@ -28,5 +29,10 @@ function Navigation(props) {
     </Navbar>
   )
 }
+
+Navigation.propTypes = {
+  onLoggedOut: PropTypes.func.isRequired,
+  user: PropTypes.string.isRequired
+};
 
 export default Navigation
