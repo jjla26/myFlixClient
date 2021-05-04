@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Card, Row, Col, ListGroup, Button, Spinner, Alert, Form, InputGroup } from 'react-bootstrap'
 import { PersonFill, KeyFill, Calendar2DateFill } from 'react-bootstrap-icons'
 import { Formik } from 'formik'
 
-import { setError } from '../../redux/actions/actions'
+import { setError, setMessage, setUserDetails, setUser } from '../../redux/actions/actions'
 import useRequest from '../../hooks/useRequest' 
 import Validation from '../../utils/registerValidation' 
 import userlogo from 'url:../../img/user.svg' 
@@ -15,10 +15,11 @@ import moment from 'moment'
 function Profile(props){
   const dispatch = useDispatch()
   const apiRequest = useRequest()
-  const { userDetails, onLoggedOut, setUserDetails, setUser, setMessage } = props
+  const { onLoggedOut } = props
   const [ loading, setLoading ] = useState(false)
   const [ showModal, setShowModal ] = useState(false) 
   const [ update, setUpdate ] = useState(false)
+  const userDetails = useSelector(state => state.userDetails)
 
   onDeleteAcc = async () => {
     setLoading(true)
@@ -43,11 +44,11 @@ function Profile(props){
         ...(values.birthday ? { Birthday : values.birthday } : {}),
       })
       localStorage.setItem('user', response.data.Username);
-      setUser(response.data.Username)
-      setUserDetails(response.data)
+      dispatch(setUser(response.data.Username))
+      dispatch(setUserDetails(response.data))
       setLoading(false)
       setUpdate(false)
-      setMessage(response.message)
+      dispatch(setMessage(response.message))
     } catch (error) {
       setLoading(false)
       dispatch(setError(error))
