@@ -1,5 +1,7 @@
 # myFlixClient
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/3bce8b46-5c75-4cf0-8783-08cfca821b39/deploy-status)](https://app.netlify.com/sites/myflixapp-client/deploys)
+
 ### Objective
 
 ###### Using React, build the client-side for an application called myFlix based on its existing server-side code (REST API and database).
