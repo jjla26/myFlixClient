@@ -16,7 +16,7 @@ function useRequest() {
         }})
       return response.data
     } catch (error) {
-      throw error.response.data.message ? error.response.data.message : "Ops! Something happened"
+      throw error.response ? error.response.data.message : "Ops! Something happened"
     }
   }
 

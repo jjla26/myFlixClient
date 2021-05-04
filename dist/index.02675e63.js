@@ -740,9 +740,9 @@ if ("development" !== "production") {
   })();
 }
 
-},{}],"68WUB":[function(require,module,exports) {
+},{}],"gm6yj":[function(require,module,exports) {
 var HMR_HOST = null;
-var HMR_PORT = 1234;
+var HMR_PORT = 1123;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d751713988987e9331980363e24189ce";
 module.bundle.HMR_BUNDLE_ID = "f9eab60bc3a7a7c3f683683702675e63";
@@ -91194,7 +91194,7 @@ function useRequest() {
       });
       return response.data;
     } catch (error) {
-      throw error.response.data.message ? error.response.data.message : "Ops! Something happened";
+      throw error.response ? error.response.data.message : "Ops! Something happened";
     }
   };
   return apiRequest;
@@ -101647,6 +101647,6 @@ const moviesApp = _redux.combineReducers({
 });
 exports.default = moviesApp;
 
-},{"redux":"7panR","../actions/actions":"2QXPk","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}]},["1j6wU","68WUB","1DVjT"], "1DVjT", "parcelRequiree668")
+},{"redux":"7panR","../actions/actions":"2QXPk","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}]},["1j6wU","gm6yj","1DVjT"], "1DVjT", "parcelRequiree668")
 
 //# sourceMappingURL=index.02675e63.js.map
