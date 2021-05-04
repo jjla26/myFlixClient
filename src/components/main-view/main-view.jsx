@@ -133,6 +133,7 @@ function MainView(){
           )
         }} />
         <Route path="/myfavorites" render={() => {
+          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
 
           return (
@@ -153,6 +154,7 @@ function MainView(){
           )
         }} />
         <Route path="/profile" render={() => {
+          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (
             <Col>
@@ -161,6 +163,7 @@ function MainView(){
           )
         }} />
         <Route path="/movies/:movieId" render={({ match, history }) => {
+          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (<Col>
             <MovieView 
@@ -188,6 +191,7 @@ function MainView(){
           )
         }} />
         <Route path="/genre/:name" render={({ match, history }) => {
+          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (
             <Col>
