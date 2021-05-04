@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux'
 import PropTypes from 'prop-types';
 import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
 import { Formik } from 'formik';
 
+import { setError } from '../../redux/actions/actions'
 import useRequest from '../../hooks/useRequest'
 import './login-view.scss'
 
 function LoginView(props) {
+  const dispatch = useDispatch()
   const { onLoggedIn } = props
   const apiRequest = useRequest()
   const [ loading, setLoading ] = useState(false)
-  const [ error, setError ] = useState(false)
+  const error = useSelector(state => state.error)
 
   const validate = values => {
     const errors = {}
@@ -35,7 +38,8 @@ function LoginView(props) {
       onLoggedIn(response)
     } catch (error) {
       setLoading(false)
-      setError(error)
+      console.log(error)
+      dispatch(setError(error))
     }
   };
 

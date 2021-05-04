@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Row, Col, Alert } from 'react-bootstrap'
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux'
 
-import { setMovies } from '../../redux/actions/actions'
+import { setMovies, setUser, setUserDetails, setMessage, setError } from '../../redux/actions/actions'
 import Navbar from '../navigation/navigation';
 import Footer from '../footer/footer';
 import LoginView from '../login-view/login-view';
@@ -19,15 +19,15 @@ import './main-view.scss'
 function MainView(){
   const dispatch = useDispatch()
   const apiRequest = useRequest()
-  const [ error, setError ] = useState(false)
-  const [ message, setMessage ] = useState(false)
-  const [ user, setUser ] = useState(null)
-  const [ userDetails, setUserDetails ] = useState({})
   const movies = useSelector(state => state.movies)
+  const message = useSelector(state => state.message)
+  const error = useSelector(state => state.error)
+  const user = useSelector(state => state.user)
+  const userDetails = useSelector(state => state.userDetails)
 
   /* When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
   const onLoggedIn = authData => {
-    setUser(authData.data.Username)
+    dispatch(setUser(authData.data.Username));
     localStorage.setItem('token', authData.token);
     localStorage.setItem('user', authData.data.Username);
     getMovies();
@@ -47,7 +47,7 @@ function MainView(){
   const getUserDetails = async (name) => {
     try {
       const response = await apiRequest('GET', `/users/${name}`)
-      setUserDetails(response.data)
+      dispatch(setUserDetails(response.data))
     } catch (error) {
       setError(error)
     }
@@ -56,14 +56,14 @@ function MainView(){
   const onLoggedOut = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    setUser(null);
+    dispatch(setUser(null));
     setMessage("You have logged out successfully  ")
   }
 
   const onAddFavorite = async movie => {
     try {
       const response = await apiRequest('POST', `/users/${user}/favorites/${movie}`)
-      setUserDetails(response.data)
+      dispatch(setUserDetails(response.data));
       setMessage(response.message)
     } catch (error) {
       setError(error)
@@ -72,7 +72,7 @@ function MainView(){
   const onDeleteFavorite = async movie => {
     try {
       const response = await apiRequest('DELETE', `/users/${user}/favorites/${movie}`)
-      setUserDetails(response.data)
+      dispatch(setUserDetails(response.data))
       setMessage(response.message)
     } catch (error) {
       setError(error)
@@ -103,7 +103,7 @@ function MainView(){
     const getData = async () => {
       const accessToken = localStorage.getItem('token');
       if (accessToken !== null) {
-        setUser(localStorage.getItem('user'));
+        dispatch(setUser(localStorage.getItem('user')));
         getMovies();
         getUserDetails(localStorage.getItem('user'))
       }

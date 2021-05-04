@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill, Calendar2DateFill } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
 import { Formik } from 'formik';
 
+import { setError } from '../../redux/actions/actions'
 import Validation from '../../utils/registerValidation'
 import useRequest from '../../hooks/useRequest'
 import './registration-view.scss'
 
 function RegistrationView(props) {
+  const dispatch = useDispatch()
   const { setMessage } = props
   const history = useHistory()
   const apiRequest = useRequest()
   const [ loading, setLoading ] = useState(false)
-  const [ error, setError ] = useState(false)
+  const error = useSelector(state => state.error)
 
   const handleSubmit = async values => {
     setLoading(true)
@@ -30,7 +33,7 @@ function RegistrationView(props) {
       history.push('/')
     } catch (error) {
       setLoading(false)
-      setError(error)
+      dispatch(setError(error))
     }
   };
 
