@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col, Alert } from 'react-bootstrap'
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux'
 
+import { setMovies } from '../../redux/actions/actions'
 import Navbar from '../navigation/navigation';
 import Footer from '../footer/footer';
 import LoginView from '../login-view/login-view';
-import MovieCard from '../movie-card/movie-card';
+import MovieList from '../movie-list/movie-list';
 import DirectorView from '../director-view/director-view';
 import GenreView from '../genre-view/genre-view';
 import MovieView from '../movie-view/movie-view';
@@ -15,12 +17,13 @@ import useRequest from '../../hooks/useRequest'
 import './main-view.scss'
 
 function MainView(){
+  const dispatch = useDispatch()
   const apiRequest = useRequest()
   const [ error, setError ] = useState(false)
   const [ message, setMessage ] = useState(false)
-  const [ movies, setMovies ] = useState([])
   const [ user, setUser ] = useState(null)
   const [ userDetails, setUserDetails ] = useState({})
+  const movies = useSelector(state => state.movies)
 
   /* When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
   const onLoggedIn = authData => {
@@ -35,7 +38,7 @@ function MainView(){
   const getMovies = async () => {
     try {
       const response = await apiRequest('GET', '/movies')
-      setMovies(response.data)
+      dispatch(setMovies(response.data))
     } catch (error) {
       setError(error)
     }
@@ -110,11 +113,7 @@ function MainView(){
 
   let renderMovies
   if (movies.length === 0) renderMovies = <div className="main-view"></div>; // Rendering movies just if there are movies
-  else renderMovies = movies.map(movie => 
-    <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
-      <MovieCard movie={movie} />
-    </Col>
-    )
+  else renderMovies = <MovieList movies={movies} />
 
   return (
     <Router>
@@ -123,7 +122,6 @@ function MainView(){
 
         <Route exact={true} path="/" render={() => {
           if(!user) return <Col><LoginView onLoggedIn={user => onLoggedIn(user)} /></Col>
-          if (movies.length === 0) return <div className="main-view" />;
           return renderMovies
         }}/>
         <Route path="/register" render={() => {
@@ -135,7 +133,6 @@ function MainView(){
           )
         }} />
         <Route path="/myfavorites" render={() => {
-          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
 
           return (
@@ -145,10 +142,7 @@ function MainView(){
               </Row>
               <Row>
                 {userDetails.FavoriteMovies && userDetails.FavoriteMovies.length > 0 ? 
-                movies.filter(movie => userDetails.FavoriteMovies && userDetails.FavoriteMovies.find(fav => fav === movie._id)).map(movie => 
-                  <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
-                    <MovieCard movie={movie} />
-                  </Col>)
+                <MovieList movies={movies.filter(movie => userDetails.FavoriteMovies && userDetails.FavoriteMovies.find(fav => fav === movie._id))} />
                 : 
                 <Col className="d-flex justify-content-center p-5">
                   <h6>Add movies to your favorites</h6>
@@ -159,7 +153,6 @@ function MainView(){
           )
         }} />
         <Route path="/profile" render={() => {
-          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (
             <Col>
@@ -168,7 +161,6 @@ function MainView(){
           )
         }} />
         <Route path="/movies/:movieId" render={({ match, history }) => {
-          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (<Col>
             <MovieView 
@@ -190,17 +182,12 @@ function MainView(){
                 <h4>{match.params.name}'s Movies</h4>
               </Row>
               <Row className="d-flex justify-content-center">
-                {movies.filter(movie => movie.Director.Name === match.params.name).map(movie => 
-                  <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
-                    <MovieCard movie={movie} />
-                  </Col>)
-                }
+                <MovieList movies={movies.filter(movie => movie.Director.Name === match.params.name)}/>
               </Row>
             </Col>
           )
         }} />
         <Route path="/genre/:name" render={({ match, history }) => {
-          if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
           return (
             <Col>
@@ -209,11 +196,7 @@ function MainView(){
                 <h4>{match.params.name} Movies</h4>
               </Row>
               <Row className="d-flex justify-content-center">
-                {movies.filter(movie => movie.Genre.Name === match.params.name).map(movie => 
-                  <Col className="content d-flex flex-column justify-content-center align-items-center" md={3} key={movie._id} >
-                    <MovieCard movie={movie} />
-                  </Col>)
-                }
+                <MovieList movies={movies.filter(movie => movie.Genre.Name === match.params.name)} />
               </Row>
             </Col>
           )
