@@ -1,22 +1,22 @@
 import { useDispatch } from 'react-redux'
 
-import { setMovies, setError } from '../redux/actions/actions'
+import { setUserDetails, setError } from '../redux/actions/actions'
 import useRequest from './useRequest'
 
 const useUserDetails = () => {
   const dispatch = useDispatch()
   const apiRequest = useRequest()
   
-  const getMovies = async () => {
+  const getUserDetails = async (name) => {
     try {
-      const response = await apiRequest('GET', '/movies')
-      dispatch(setMovies(response.data))
+      const response = await apiRequest('GET', `/users/${name}`)
+      dispatch(setUserDetails(response.data))
     } catch (error) {
       dispatch(setError(error))
     }
   }
 
-  return getMovies
+  return getUserDetails
 }
 
 export default useUserDetails
