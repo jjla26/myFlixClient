@@ -13,6 +13,7 @@ import GenreView from '../genre-view/genre-view';
 import MovieView from '../movie-view/movie-view';
 import ProfileView from '../profile-view/profile-view';
 import RegistrationView from '../registration-view/registration-view';
+import FavoritesView from '../favorites-view/favorites-view';
 import useRequest from '../../hooks/useRequest'
 import './main-view.scss'
 
@@ -79,7 +80,7 @@ function MainView(){
         {user && <Navbar />}
       </Row>
       <Row className="main-view d-flex justify-content-md-center">
-        <Route path="/myfavorites" component={MovieList} />          
+        <Route path="/myfavorites" component={FavoritesView} />          
         <Route path="/movies/:movieId" component={MovieView} />          
         <Route path="/director/:name" component={DirectorView} />
         <Route path="/genre/:name" component={GenreView} />
@@ -89,9 +90,7 @@ function MainView(){
         <Alert show={!!error} className="error-message" variant="secondary">{error}</Alert>
         <Alert show={!!message} className="success-message" variant="primary">{message}</Alert>
       </Row>
-      <Row className="main-view">
-        <Footer />
-      </Row>
+      <Footer />
     </Router>
   );
 };
