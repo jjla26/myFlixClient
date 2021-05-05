@@ -25,15 +25,7 @@ function MainView(){
   const user = useSelector(state => state.user)
   const userDetails = useSelector(state => state.userDetails)
 
-  /* When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
-  const onLoggedIn = authData => {
-    dispatch(setUser(authData.data.Username));
-    localStorage.setItem('token', authData.token);
-    localStorage.setItem('user', authData.data.Username);
-    getMovies();
-    getUserDetails(authData.data.Username, authData.token)
-    dispatch(setMessage("You have logged in successfully"))
-  }
+
 
   const getMovies = async () => {
     try {
@@ -111,20 +103,10 @@ function MainView(){
     getData()
   },[])
 
-  let renderMovies
-  if (movies.length === 0) renderMovies = <div className="main-view"></div>; // Rendering movies just if there are movies
-  else renderMovies = <MovieList movies={movies} />
-
   return (
     <Router>
       {user && <Navbar user={user} onLoggedOut={onLoggedOut}/>}
       <Row className="main-view d-flex justify-content-md-center">
-
-        <Route exact={true} path="/" render={() => {
-          if(!user) return <Col><LoginView onLoggedIn={user => onLoggedIn(user)} /></Col>
-          return renderMovies
-        }}/>
-        <Route path="/register" component={RegistrationView} />
         <Route path="/myfavorites" render={() => {
           if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
@@ -183,21 +165,9 @@ function MainView(){
             </Col>
           )
         }} />
-        <Route path="/genre/:name" render={({ match, history }) => {
-          if (movies.length === 0) return <div className="main-view" />;
-          if(!user) return <Redirect to="/" />
-          return (
-            <Col>
-              <GenreView genre={movies.find(movie => movie.Genre.Name === match.params.name).Genre} onBackButton={() => history.goBack()} />
-              <Row className="d-flex justify-content-center">
-                <h4>{match.params.name} Movies</h4>
-              </Row>
-              <Row className="d-flex justify-content-center">
-                <MovieList movies={movies.filter(movie => movie.Genre.Name === match.params.name)} />
-              </Row>
-            </Col>
-          )
-        }} />
+        <Route path="/genre/:name" component={GenreView} />
+        <Route path="/register" component={RegistrationView} />
+        <Route exact={true} path="/" component={user ? MovieList : LoginView} />
       </Row>
       <Footer />
       <Alert show={!!error} className="error-message" variant="secondary">{error}</Alert>
