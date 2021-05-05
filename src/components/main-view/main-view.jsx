@@ -150,21 +150,7 @@ function MainView(){
           </Col>
           )
         }}/>
-        <Route path="/director/:name" render={({ match, history }) => {
-          if (movies.length === 0) return <div className="main-view" />;
-          if(!user) return <Redirect to="/" />
-          return (
-            <Col>
-              <DirectorView director={movies.find(movie => movie.Director.Name === match.params.name).Director}  onBackButton={() => history.goBack()} />
-              <Row className="d-flex justify-content-center">
-                <h4>{match.params.name}'s Movies</h4>
-              </Row>
-              <Row className="d-flex justify-content-center">
-                <MovieList movies={movies.filter(movie => movie.Director.Name === match.params.name)}/>
-              </Row>
-            </Col>
-          )
-        }} />
+        <Route path="/director/:name" component={DirectorView} />
         <Route path="/genre/:name" component={GenreView} />
         <Route path="/register" component={RegistrationView} />
         <Route exact={true} path="/" component={user ? MovieList : LoginView} />
