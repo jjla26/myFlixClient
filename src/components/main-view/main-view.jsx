@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Alert } from 'react-bootstrap'
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux'
 
 import { setUser, setMessage, setError } from '../../redux/actions/actions'
 import Navbar from '../navigation/navigation';
+import Loading from '../loading/loading';
 import Footer from '../footer/footer';
 import LoginView from '../login-view/login-view';
 import MovieList from '../movie-list/movie-list';
@@ -22,9 +23,11 @@ function MainView(){
   const dispatch = useDispatch()
   const getUserDetails = useUserDetails()
   const getMovies = useMovies()
+  const [ loading, setLoading ] = useState(true)
   const message = useSelector(state => state.message)
   const error = useSelector(state => state.error)
   const user = useSelector(state => state.user)
+  console.log(loading)
 
   useEffect(() => {
     let timeout
@@ -54,20 +57,23 @@ function MainView(){
         getMovies();
         getUserDetails(localStorage.getItem('user'))
       }
+      setLoading(false)
     }
     getData()
   },[])
 
   return (
+    loading ? <Loading />
+    :
     <Router>
       {user && <Navbar />}
+      {!user && <Redirect to="/" />}
       <Route path="/myfavorites" component={FavoritesView} />          
       <Route path="/movies/:movieId" component={MovieView} />          
       <Route path="/director/:name" component={DirectorView} />
       <Route path="/genre/:name" component={GenreView} />
       <Route path="/profile" component={ProfileView} /> 
       <Route path="/register" component={RegistrationView} />
-      <Route exact={true} path="/" component={user ? MovieList : LoginView} />
       <Route exact={true} path="/" component={user ? MovieList : LoginView} />
       <Redirect to="/" />
       <Alert show={!!error} className="error-message" variant="secondary">{error}</Alert>
