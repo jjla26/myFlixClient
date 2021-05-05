@@ -89250,20 +89250,27 @@ try {
     const movies = _reactRedux.useSelector(state => state.movies);
     const movie = movies.find(movie => movie.Director.Name === match.params.name);
     return (
-      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 15,
           columnNumber: 5
         }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 17,
+          columnNumber: 7
+        }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         className: "director-view d-flex flex-column justify-content-center align-items-center",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 16,
-          columnNumber: 7
+          lineNumber: 18,
+          columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         md: 10,
@@ -89271,99 +89278,99 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 17,
-          columnNumber: 9
+          lineNumber: 19,
+          columnNumber: 11
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         p: 5,
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 18,
-          columnNumber: 11
+          lineNumber: 20,
+          columnNumber: 13
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "m-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 19,
-          columnNumber: 13
+          lineNumber: 21,
+          columnNumber: 15
         }
       }, "Name: ", movie?.Director?.Name)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 23,
-          columnNumber: 11
+          lineNumber: 25,
+          columnNumber: 13
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "m-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 24,
-          columnNumber: 13
+          lineNumber: 26,
+          columnNumber: 15
         }
       }, "Birthdate: ", _momentDefault.default(movie?.Director?.Birth).format('DD-MM-YYYY'))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 28,
-          columnNumber: 11
+          lineNumber: 30,
+          columnNumber: 13
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "m-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 29,
-          columnNumber: 13
+          lineNumber: 31,
+          columnNumber: 15
         }
       }, "Description: ", movie?.Director?.Bio)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 33,
-          columnNumber: 11
+          lineNumber: 35,
+          columnNumber: 13
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 34,
-          columnNumber: 13
+          lineNumber: 36,
+          columnNumber: 15
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
         onClick: () => history.goBack(),
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 35,
-          columnNumber: 15
+          lineNumber: 37,
+          columnNumber: 17
         }
       }, "Back"))))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         className: "d-flex justify-content-center",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 40,
-          columnNumber: 7
+          lineNumber: 42,
+          columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement("h4", {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 41,
-          columnNumber: 9
+          lineNumber: 43,
+          columnNumber: 11
         }
       }, match.params.name, "'s Movies")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         className: "director-movies d-flex justify-content-center",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 43,
-          columnNumber: 7
+          lineNumber: 45,
+          columnNumber: 9
         }
       }, movies.filter(movie => movie.Director.Name === match.params.name).map(movie => /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "d-flex justify-content-center align-items-center",
@@ -89372,18 +89379,18 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 45,
-          columnNumber: 11
+          lineNumber: 47,
+          columnNumber: 13
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_movieCardMovieCardDefault.default, {
         movie: movie,
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 46,
-          columnNumber: 13
+          lineNumber: 48,
+          columnNumber: 15
         }
-      })))))
+      }))))))
     );
   }
   _s(DirectorView, "eStvhP8slTt+s7x6M95dK6yXYA4=", false, function () {
