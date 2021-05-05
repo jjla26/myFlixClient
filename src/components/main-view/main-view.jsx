@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Alert } from 'react-bootstrap'
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux'
 
 import { setUser, setMessage, setError } from '../../redux/actions/actions'
@@ -27,7 +27,6 @@ function MainView(){
   const message = useSelector(state => state.message)
   const error = useSelector(state => state.error)
   const user = useSelector(state => state.user)
-  console.log(loading)
 
   useEffect(() => {
     let timeout
@@ -50,16 +49,16 @@ function MainView(){
   },[message])
 
   useEffect(() => {
-    const getData = async () => {
+    const getData = () => {
       const accessToken = localStorage.getItem('token');
       if (accessToken !== null) {
         dispatch(setUser(localStorage.getItem('user')));
         getMovies();
         getUserDetails(localStorage.getItem('user'))
       }
-      setLoading(false)
     }
     getData()
+    setLoading(false)
   },[])
 
   return (
@@ -68,14 +67,16 @@ function MainView(){
     <Router>
       {user && <Navbar />}
       {!user && <Redirect to="/" />}
-      <Route path="/myfavorites" component={FavoritesView} />          
-      <Route path="/movies/:movieId" component={MovieView} />          
-      <Route path="/director/:name" component={DirectorView} />
-      <Route path="/genre/:name" component={GenreView} />
-      <Route path="/profile" component={ProfileView} /> 
-      <Route path="/register" component={RegistrationView} />
-      <Route exact={true} path="/" component={user ? MovieList : LoginView} />
-      <Redirect to="/" />
+      <Switch>
+        <Route path="/myfavorites" component={FavoritesView} />          
+        <Route path="/movies/:movieId" component={MovieView} />          
+        <Route path="/director/:name" component={DirectorView} />
+        <Route path="/genre/:name" component={GenreView} />
+        <Route path="/profile" component={ProfileView} /> 
+        <Route path="/register" component={RegistrationView} />
+        <Route exact={true} path="/" component={user ? MovieList : LoginView} />
+        <Redirect to="/" />
+      </Switch>
       <Alert show={!!error} className="error-message" variant="secondary">{error}</Alert>
       <Alert show={!!message} className="success-message" variant="primary">{message}</Alert>
       <Footer />
