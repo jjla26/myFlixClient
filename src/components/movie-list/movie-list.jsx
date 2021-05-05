@@ -23,11 +23,11 @@ function MoviesList(props) {
 
  return (
    <Col className="movie-list">
-     <Row>
-       {filteredMovies.map(m => (
-         <Col className="d-flex justify-content-center align-items-center" md={3} key={m._id}>
-           <MovieCard movie={m} />
-         </Col>))}
+    <Row className="m-5">
+      {filteredMovies.map(m => (
+        <Col className="d-flex justify-content-center align-items-center" md={3} key={m._id}>
+          <MovieCard movie={m} />
+        </Col>))}
      </Row>
    </Col>
  )
