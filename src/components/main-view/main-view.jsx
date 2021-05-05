@@ -73,7 +73,7 @@ function MainView(){
         <Route path="/director/:name" component={DirectorView} />
         <Route path="/genre/:name" component={GenreView} />
         <Route path="/profile" component={ProfileView} /> 
-        <Route path="/register" component={RegistrationView} />
+        <Route path="/register" component={user ? MovieList : RegistrationView} />
         <Route exact={true} path="/" component={user ? MovieList : LoginView} />
         <Redirect to="/" />
       </Switch>
