@@ -1,13 +1,15 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import { Navbar, Nav, NavDropdown } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import PropTypes from 'prop-types';
 
+import useLogOut from '../../hooks/useLogOut'
 import VisibilityFilterInput from '../visibility-filter-input/visibility-filter-input';
 import './navigation.scss'
 
-function Navigation(props) {
-  const { user, onLoggedOut } = props
+function Navigation() {
+  const onLoggedOut = useLogOut()
+  const user = useSelector( state => state.user)
   return (
     <Navbar className="navigation" collapseOnSelect expand="lg" bg="secondary" variant="primary" sticky="top">
       <Navbar.Brand as={Link} to='/'>MYFLIX APP</Navbar.Brand>
@@ -29,10 +31,5 @@ function Navigation(props) {
     </Navbar>
   )
 }
-
-Navigation.propTypes = {
-  onLoggedOut: PropTypes.func.isRequired,
-  user: PropTypes.string.isRequired
-};
 
 export default Navigation
