@@ -6,12 +6,12 @@ import PropTypes from 'prop-types';
 import MovieCard from '../movie-card/movie-card';
 
 const mapStateToProps = state => {
-  const { visibilityFilter } = state;
-  return { visibilityFilter };
+  const { visibilityFilter, movies } = state;
+  return { visibilityFilter, movies};
 };
 
 function MoviesList(props) {
-  const { movies, visibilityFilter } = props;
+  const { visibilityFilter, movies } = props;
   let filteredMovies = movies;
 
   if (visibilityFilter !== '') {

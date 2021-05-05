@@ -124,14 +124,7 @@ function MainView(){
           if(!user) return <Col><LoginView onLoggedIn={user => onLoggedIn(user)} /></Col>
           return renderMovies
         }}/>
-        <Route path="/register" render={() => {
-          if (user) return <Redirect to="/" />
-          return (
-            <Col>
-              <RegistrationView />
-            </Col>
-          )
-        }} />
+        <Route path="/register" component={RegistrationView} />
         <Route path="/myfavorites" render={() => {
           if (movies.length === 0) return <div className="main-view" />;
           if(!user) return <Redirect to="/" />
