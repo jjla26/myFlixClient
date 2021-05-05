@@ -18578,6 +18578,13 @@ h3 {
   border-radius: 2px 0px 0px 2px;
 }
 
+.director-view {
+  margin: 20px;
+}
+
+.director-movies {
+  margin: 40px 0 70px 0;
+}
 @charset "UTF-8";
 /* import bootstrap to set changes */
 /*!
@@ -27851,13 +27858,6 @@ h3 {
   transform: scale(1.2);
   z-index: 1;
   background-color: black !important;
-}
-.director-view {
-  margin: 20px;
-}
-
-.director-movies {
-  margin: 40px 0 70px 0;
 }
 .genre-view {
   margin: 20px;
@@ -46425,6 +46425,12 @@ h3 {
 }
 .movie-list {
   margin: 40px 0 70px 0;
+}
+.loading-view {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .favorites-movies {
   margin: 40px 0 70px 0;
