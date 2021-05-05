@@ -14,33 +14,17 @@ import MovieView from '../movie-view/movie-view';
 import ProfileView from '../profile-view/profile-view';
 import RegistrationView from '../registration-view/registration-view';
 import FavoritesView from '../favorites-view/favorites-view';
-import useRequest from '../../hooks/useRequest'
+import useUserDetails from '../../hooks/useUserDetails';
+import useMovies from '../../hooks/useMovies';
 import './main-view.scss'
 
 function MainView(){
   const dispatch = useDispatch()
-  const apiRequest = useRequest()
+  const getUserDetails = useUserDetails()
+  const getMovies = useMovies()
   const message = useSelector(state => state.message)
   const error = useSelector(state => state.error)
   const user = useSelector(state => state.user)
-
-  const getMovies = async () => {
-    try {
-      const response = await apiRequest('GET', '/movies')
-      dispatch(setMovies(response.data))
-    } catch (error) {
-      dispatch(setError(error))
-    }
-  }
-
-  const getUserDetails = async (name) => {
-    try {
-      const response = await apiRequest('GET', `/users/${name}`)
-      dispatch(setUserDetails(response.data))
-    } catch (error) {
-      dispatch(setError(error))
-    }
-  }
 
   useEffect(() => {
     let timeout

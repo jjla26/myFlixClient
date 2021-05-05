@@ -7,11 +7,15 @@ import { Formik } from 'formik';
 
 import { setError, setUser, setMessage, setMovies, setUserDetails } from '../../redux/actions/actions'
 import useRequest from '../../hooks/useRequest'
+import useUserDetails from '../../hooks/useUserDetails';
+import useMovies from '../../hooks/useMovies';
 import './login-view.scss'
 
 function LoginView(props) {
   const dispatch = useDispatch()
   const apiRequest = useRequest()
+  const getUserDetails = useUserDetails()
+  const getMovies = useMovies()
   const [ loading, setLoading ] = useState(false)
 
   const validate = values => {
@@ -35,24 +39,6 @@ function LoginView(props) {
     getMovies();
     getUserDetails(authData.data.Username, authData.token)
     dispatch(setMessage("You have logged in successfully"))
-  }
-
-  const getMovies = async () => {
-    try {
-      const response = await apiRequest('GET', '/movies')
-      dispatch(setMovies(response.data))
-    } catch (error) {
-      dispatch(setError(error))
-    }
-  }
-
-  const getUserDetails = async (name) => {
-    try {
-      const response = await apiRequest('GET', `/users/${name}`)
-      dispatch(setUserDetails(response.data))
-    } catch (error) {
-      dispatch(setError(error))
-    }
   }
 
   const handleSubmit = async (values) => {
