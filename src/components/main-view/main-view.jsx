@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
-import { Row, Alert } from 'react-bootstrap'
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Alert } from 'react-bootstrap'
+import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux'
 
-import { setMovies, setUser, setUserDetails, setMessage, setError } from '../../redux/actions/actions'
+import { setUser, setMessage, setError } from '../../redux/actions/actions'
 import Navbar from '../navigation/navigation';
 import Footer from '../footer/footer';
 import LoginView from '../login-view/login-view';
@@ -68,6 +68,8 @@ function MainView(){
       <Route path="/profile" component={ProfileView} /> 
       <Route path="/register" component={RegistrationView} />
       <Route exact={true} path="/" component={user ? MovieList : LoginView} />
+      <Route exact={true} path="/" component={user ? MovieList : LoginView} />
+      <Redirect to="/" />
       <Alert show={!!error} className="error-message" variant="secondary">{error}</Alert>
       <Alert show={!!message} className="success-message" variant="primary">{message}</Alert>
       <Footer />
