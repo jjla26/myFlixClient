@@ -1,9 +1,10 @@
 import React from 'react';
-import Col from 'react-bootstrap/Col';
+import { Col, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import MovieCard from '../movie-card/movie-card';
+import './movie-list.scss'
 
 const mapStateToProps = state => {
   const { visibilityFilter, movies } = state;
@@ -20,10 +21,16 @@ function MoviesList(props) {
 
   if (!movies) return <div className="main-view"/>;
 
- return filteredMovies.map(m => (
-    <Col md={3} key={m._id}>
-      <MovieCard movie={m} />
-    </Col>))
+ return (
+   <Col className="movie-list">
+     <Row>
+       {filteredMovies.map(m => (
+         <Col className="d-flex justify-content-center align-items-center" md={3} key={m._id}>
+           <MovieCard movie={m} />
+         </Col>))}
+     </Row>
+   </Col>
+ )
 }
 
 MoviesList.propTypes = {
