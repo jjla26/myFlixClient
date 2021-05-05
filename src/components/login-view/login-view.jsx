@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux'
-import PropTypes from 'prop-types';
 import { Row, Col, Card, Form, Button, InputGroup, Spinner, Alert } from 'react-bootstrap'
 import { PersonFill, KeyFill } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
@@ -153,9 +152,5 @@ function LoginView(props) {
     </Col>
   );
 }
-
-LoginView.propTypes = {
-  onLoggedIn: PropTypes.func.isRequired,
-};
 
 export default LoginView
