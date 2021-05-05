@@ -22,14 +22,16 @@ function MoviesList(props) {
   if (!movies) return <div className="main-view"/>;
 
  return (
-   <Col className="movie-list">
-    <Row className="m-5">
-      {filteredMovies.map(m => (
-        <Col className="d-flex justify-content-center align-items-center" md={3} key={m._id}>
-          <MovieCard movie={m} />
-        </Col>))}
-     </Row>
-   </Col>
+   <Row>
+    <Col className="movie-list">
+      <Row className="d-flex justify-content-center align-items-center">
+        {filteredMovies.map(m => (
+          <Col className="d-flex justify-content-center align-items-center" md={3} key={m._id}>
+            <MovieCard movie={m} />
+          </Col>))}
+      </Row>
+    </Col>
+   </Row>
  )
 }
 

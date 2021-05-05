@@ -68,88 +68,91 @@ function LoginView(props) {
   };
 
   return (
-    <Col>
-      <Row className="login-view">
-        <Col className="d-flex justify-content-center align-items-center" xs={12}>
-          <h1>MyFlix</h1>
-        </Col>
-        <Col className="d-flex justify-content-center" xs={12}>
-          <Card className="login-card">
-            <Card.Header className="login-card__header">
-              Sign In
-            </Card.Header>
-            <Card.Body>
-              <Formik
-                validate={validate}
-                onSubmit={handleSubmit}
-                initialValues={{
-                  username: '',
-                  password: '',
-                }}
-              >
-                {({
-                  handleSubmit,
-                  handleChange,
-                  handleBlur,
-                  touched,
-                  values,
-                  errors,
-                }) => (
-                <Form>
-                  <Form.Group controlId="formUsername">
-                    <InputGroup>
-                      <InputGroup.Prepend className="login-card__prepend">
-                        <PersonFill />
-                      </InputGroup.Prepend>
-                      <Form.Control 
-                        name="username" 
-                        isInvalid={touched.username && !!errors.username} 
-                        autoComplete="username" 
-                        type="text" 
-                        placeholder="username" 
-                        value={values.username} 
-                        onChange={handleChange} 
-                        onBlur={handleBlur} />
-                      <Form.Control.Feedback type="invalid">
-                        {errors.username}
-                      </Form.Control.Feedback>
-                    </InputGroup>
-                  </Form.Group>
+    <Row>
 
-                  <Form.Group controlId="formPassword">
-                    <InputGroup className="mb-2">
-                      <InputGroup.Prepend className="login-card__prepend">
-                        <KeyFill />
-                      </InputGroup.Prepend>
-                      <Form.Control 
-                        name="password" 
-                        isInvalid={touched.password && !!errors.password} 
-                        autoComplete="current-password" 
-                        type="password" 
-                        placeholder="password" 
-                        value={values.password} 
-                        onChange={handleChange} 
-                        onBlur={handleBlur} />
-                      <Form.Control.Feedback type="invalid">
-                        {errors.password}
-                      </Form.Control.Feedback>
-                    </InputGroup>
-                  </Form.Group>
-                  {loading ? 
-                  <Spinner className="float-right" animation="grow" variant="primary"/>
-                  :
-                  <Button className="float-right" variant="primary" type="submit" onClick={handleSubmit}>
-                    LogIn
-                  </Button>
-                  }
-                </Form>)}
-              </Formik>
-            </Card.Body>
-            {!loading && <Card.Footer>Don't you have an account? <Link to='/register'>Sign Up</Link></Card.Footer>}
-          </Card>
-        </Col>
-      </Row>
-    </Col>
+      <Col>
+        <Row className="login-view">
+          <Col className="d-flex justify-content-center align-items-center" xs={12}>
+            <h1>MyFlix</h1>
+          </Col>
+          <Col className="d-flex justify-content-center" xs={12}>
+            <Card className="login-card">
+              <Card.Header className="login-card__header">
+                Sign In
+              </Card.Header>
+              <Card.Body>
+                <Formik
+                  validate={validate}
+                  onSubmit={handleSubmit}
+                  initialValues={{
+                    username: '',
+                    password: '',
+                  }}
+                >
+                  {({
+                    handleSubmit,
+                    handleChange,
+                    handleBlur,
+                    touched,
+                    values,
+                    errors,
+                  }) => (
+                  <Form>
+                    <Form.Group controlId="formUsername">
+                      <InputGroup>
+                        <InputGroup.Prepend className="login-card__prepend">
+                          <PersonFill />
+                        </InputGroup.Prepend>
+                        <Form.Control 
+                          name="username" 
+                          isInvalid={touched.username && !!errors.username} 
+                          autoComplete="username" 
+                          type="text" 
+                          placeholder="username" 
+                          value={values.username} 
+                          onChange={handleChange} 
+                          onBlur={handleBlur} />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.username}
+                        </Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
+
+                    <Form.Group controlId="formPassword">
+                      <InputGroup className="mb-2">
+                        <InputGroup.Prepend className="login-card__prepend">
+                          <KeyFill />
+                        </InputGroup.Prepend>
+                        <Form.Control 
+                          name="password" 
+                          isInvalid={touched.password && !!errors.password} 
+                          autoComplete="current-password" 
+                          type="password" 
+                          placeholder="password" 
+                          value={values.password} 
+                          onChange={handleChange} 
+                          onBlur={handleBlur} />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.password}
+                        </Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
+                    {loading ? 
+                    <Spinner className="float-right" animation="grow" variant="primary"/>
+                    :
+                    <Button className="float-right" variant="primary" type="submit" onClick={handleSubmit}>
+                      LogIn
+                    </Button>
+                    }
+                  </Form>)}
+                </Formik>
+              </Card.Body>
+              {!loading && <Card.Footer>Don't you have an account? <Link to='/register'>Sign Up</Link></Card.Footer>}
+            </Card>
+          </Col>
+        </Row>
+      </Col>
+    </Row>
   );
 }
 

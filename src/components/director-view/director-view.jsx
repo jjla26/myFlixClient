@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Row, Col, Button} from 'react-bootstrap'
 
-import MovieList from '../movie-list/movie-list'
+import MovieCard from '../movie-card/movie-card'
 import './director-view.scss'
 import moment from 'moment'
 
@@ -40,8 +40,12 @@ function DirectorView(props){
       <Row className="d-flex justify-content-center">
         <h4>{match.params.name}'s Movies</h4>
       </Row>
-      <Row className="d-flex justify-content-center">
-        <MovieList movies={movies.filter(movie => movie.Director.Name === match.params.name)}/>
+      <Row className="director-movies d-flex justify-content-center">
+        {movies.filter(movie => movie.Director.Name === match.params.name).map(movie => 
+          <Col className="d-flex justify-content-center align-items-center" md={3} key={movie._id} >
+            <MovieCard movie={movie} />
+          </Col>
+        )}
       </Row>
     </Col>
   )

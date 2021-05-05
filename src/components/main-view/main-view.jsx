@@ -76,20 +76,16 @@ function MainView(){
 
   return (
     <Router>
-      <Row className="main-view">
-        {user && <Navbar />}
-      </Row>
-      <Row className="main-view d-flex justify-content-md-center">
-        <Route path="/myfavorites" component={FavoritesView} />          
-        <Route path="/movies/:movieId" component={MovieView} />          
-        <Route path="/director/:name" component={DirectorView} />
-        <Route path="/genre/:name" component={GenreView} />
-        <Route path="/profile" component={ProfileView} /> 
-        <Route path="/register" component={RegistrationView} />
-        <Route exact={true} path="/" component={user ? MovieList : LoginView} />
-        <Alert show={!!error} className="error-message" variant="secondary">{error}</Alert>
-        <Alert show={!!message} className="success-message" variant="primary">{message}</Alert>
-      </Row>
+      {user && <Navbar />}
+      <Route path="/myfavorites" component={FavoritesView} />          
+      <Route path="/movies/:movieId" component={MovieView} />          
+      <Route path="/director/:name" component={DirectorView} />
+      <Route path="/genre/:name" component={GenreView} />
+      <Route path="/profile" component={ProfileView} /> 
+      <Route path="/register" component={RegistrationView} />
+      <Route exact={true} path="/" component={user ? MovieList : LoginView} />
+      <Alert show={!!error} className="error-message" variant="secondary">{error}</Alert>
+      <Alert show={!!message} className="success-message" variant="primary">{message}</Alert>
       <Footer />
     </Router>
   );
