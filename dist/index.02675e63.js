@@ -26314,8 +26314,6 @@ try {
   var _reduxActionsActions = require('../../redux/actions/actions');
   var _navigationNavigation = require('../navigation/navigation');
   var _navigationNavigationDefault = _parcelHelpers.interopDefault(_navigationNavigation);
-  var _loadingLoading = require('../loading/loading');
-  var _loadingLoadingDefault = _parcelHelpers.interopDefault(_loadingLoading);
   var _footerFooter = require('../footer/footer');
   var _footerFooterDefault = _parcelHelpers.interopDefault(_footerFooter);
   var _loginViewLoginView = require('../login-view/login-view');
@@ -26332,23 +26330,68 @@ try {
   var _profileViewProfileViewDefault = _parcelHelpers.interopDefault(_profileViewProfileView);
   var _registrationViewRegistrationView = require('../registration-view/registration-view');
   var _registrationViewRegistrationViewDefault = _parcelHelpers.interopDefault(_registrationViewRegistrationView);
-  var _favoritesViewFavoritesView = require('../favorites-view/favorites-view');
-  var _favoritesViewFavoritesViewDefault = _parcelHelpers.interopDefault(_favoritesViewFavoritesView);
-  var _hooksUseUserDetails = require('../../hooks/useUserDetails');
-  var _hooksUseUserDetailsDefault = _parcelHelpers.interopDefault(_hooksUseUserDetails);
-  var _hooksUseMovies = require('../../hooks/useMovies');
-  var _hooksUseMoviesDefault = _parcelHelpers.interopDefault(_hooksUseMovies);
+  var _hooksUseRequest = require('../../hooks/useRequest');
+  var _hooksUseRequestDefault = _parcelHelpers.interopDefault(_hooksUseRequest);
   require('./main-view.scss');
   var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/main-view/main-view.jsx", _s = $RefreshSig$();
   function MainView() {
     _s();
     const dispatch = _reactRedux.useDispatch();
-    const getUserDetails = _hooksUseUserDetailsDefault.default();
-    const getMovies = _hooksUseMoviesDefault.default();
-    const [loading, setLoading] = _react.useState(true);
+    const apiRequest = _hooksUseRequestDefault.default();
+    const movies = _reactRedux.useSelector(state => state.movies);
     const message = _reactRedux.useSelector(state => state.message);
     const error = _reactRedux.useSelector(state => state.error);
     const user = _reactRedux.useSelector(state => state.user);
+    const userDetails = _reactRedux.useSelector(state => state.userDetails);
+    /*When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
+    const onLoggedIn = authData => {
+      dispatch(_reduxActionsActions.setUser(authData.data.Username));
+      localStorage.setItem('token', authData.token);
+      localStorage.setItem('user', authData.data.Username);
+      getMovies();
+      getUserDetails(authData.data.Username, authData.token);
+      dispatch(_reduxActionsActions.setMessage("You have logged in successfully"));
+    };
+    const getMovies = async () => {
+      try {
+        const response = await apiRequest('GET', '/movies');
+        dispatch(_reduxActionsActions.setMovies(response.data));
+      } catch (error) {
+        dispatch(_reduxActionsActions.setError(error));
+      }
+    };
+    const getUserDetails = async name => {
+      try {
+        const response = await apiRequest('GET', `/users/${name}`);
+        dispatch(_reduxActionsActions.setUserDetails(response.data));
+      } catch (error) {
+        dispatch(_reduxActionsActions.setError(error));
+      }
+    };
+    const onLoggedOut = () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      dispatch(_reduxActionsActions.setUser(null));
+      dispatch(_reduxActionsActions.setMessage("You have logged out successfully  "));
+    };
+    const onAddFavorite = async movie => {
+      try {
+        const response = await apiRequest('POST', `/users/${user}/favorites/${movie}`);
+        dispatch(_reduxActionsActions.setUserDetails(response.data));
+        dispatch(_reduxActionsActions.setMessage(response.message));
+      } catch (error) {
+        _reduxActionsActions.setError(error);
+      }
+    };
+    const onDeleteFavorite = async movie => {
+      try {
+        const response = await apiRequest('DELETE', `/users/${user}/favorites/${movie}`);
+        dispatch(_reduxActionsActions.setUserDetails(response.data));
+        dispatch(_reduxActionsActions.setMessage(response.message));
+      } catch (error) {
+        dispatch(_reduxActionsActions.setError(error));
+      }
+    };
     _react.useEffect(() => {
       let timeout;
       if (error) {
@@ -26368,7 +26411,7 @@ try {
       };
     }, [message]);
     _react.useEffect(() => {
-      const getData = () => {
+      const getData = async () => {
         const accessToken = localStorage.getItem('token');
         if (accessToken !== null) {
           dispatch(_reduxActionsActions.setUser(localStorage.getItem('user')));
@@ -26377,147 +26420,506 @@ try {
         }
       };
       getData();
-      setLoading(false);
     }, []);
-    return loading ? /*#__PURE__*/_reactDefault.default.createElement(_loadingLoadingDefault.default, {
+    let renderMovies;
+    if (movies.length === 0) renderMovies = /*#__PURE__*/_reactDefault.default.createElement("div", {
+      className: "main-view",
       __self: this,
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 65,
-        columnNumber: 15
+        lineNumber: 115,
+        columnNumber: 43
       }
-    }) : /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.BrowserRouter, {
+    }); else // Rendering movies just if there are movies
+    renderMovies = /*#__PURE__*/_reactDefault.default.createElement(_movieListMovieListDefault.default, {
+      movies: movies,
       __self: this,
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 67,
-        columnNumber: 5
+        lineNumber: 116,
+        columnNumber: 23
       }
-    }, user && /*#__PURE__*/_reactDefault.default.createElement(_navigationNavigationDefault.default, {
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 68,
-        columnNumber: 16
-      }
-    }), !user && /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Redirect, {
-      to: "/",
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 69,
-        columnNumber: 17
-      }
-    }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Switch, {
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 70,
-        columnNumber: 7
-      }
-    }, /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
-      path: "/myfavorites",
-      component: _favoritesViewFavoritesViewDefault.default,
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 71,
-        columnNumber: 9
-      }
-    }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
-      path: "/movies/:movieId",
-      component: _movieViewMovieViewDefault.default,
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 72,
-        columnNumber: 9
-      }
-    }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
-      path: "/director/:name",
-      component: _directorViewDirectorViewDefault.default,
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 73,
-        columnNumber: 9
-      }
-    }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
-      path: "/genre/:name",
-      component: _genreViewGenreViewDefault.default,
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 74,
-        columnNumber: 9
-      }
-    }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
-      path: "/profile",
-      component: _profileViewProfileViewDefault.default,
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 75,
-        columnNumber: 9
-      }
-    }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
-      path: "/register",
-      component: user ? _movieListMovieListDefault.default : _registrationViewRegistrationViewDefault.default,
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 76,
-        columnNumber: 9
-      }
-    }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
-      exact: true,
-      path: "/",
-      component: user ? _movieListMovieListDefault.default : _loginViewLoginViewDefault.default,
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 77,
-        columnNumber: 9
-      }
-    }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Redirect, {
-      to: "/",
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 78,
-        columnNumber: 9
-      }
-    })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Alert, {
-      show: !!error,
-      className: "error-message",
-      variant: "secondary",
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 80,
-        columnNumber: 7
-      }
-    }, error), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Alert, {
-      show: !!message,
-      className: "success-message",
-      variant: "primary",
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 81,
-        columnNumber: 7
-      }
-    }, message), /*#__PURE__*/_reactDefault.default.createElement(_footerFooterDefault.default, {
-      __self: this,
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 82,
-        columnNumber: 7
-      }
-    }));
+    });
+    return (
+      /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.BrowserRouter, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 119,
+          columnNumber: 5
+        }
+      }, user && /*#__PURE__*/_reactDefault.default.createElement(_navigationNavigationDefault.default, {
+        user: user,
+        onLoggedOut: onLoggedOut,
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 120,
+          columnNumber: 16
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+        className: "main-view d-flex justify-content-md-center",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 121,
+          columnNumber: 7
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
+        exact: true,
+        path: "/",
+        render: () => {
+          if (!user) return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 124,
+                columnNumber: 28
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement(_loginViewLoginViewDefault.default, {
+              onLoggedIn: user => onLoggedIn(user),
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 124,
+                columnNumber: 33
+              }
+            }))
+          );
+          return renderMovies;
+        },
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 123,
+          columnNumber: 9
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
+        path: "/register",
+        render: () => {
+          if (user) return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Redirect, {
+              to: "/",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 128,
+                columnNumber: 28
+              }
+            })
+          );
+          return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 130,
+                columnNumber: 13
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement(_registrationViewRegistrationViewDefault.default, {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 131,
+                columnNumber: 15
+              }
+            }))
+          );
+        },
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 127,
+          columnNumber: 9
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
+        path: "/myfavorites",
+        render: () => {
+          if (movies.length === 0) return (
+            /*#__PURE__*/_reactDefault.default.createElement("div", {
+              className: "main-view",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 136,
+                columnNumber: 43
+              }
+            })
+          );
+          if (!user) return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Redirect, {
+              to: "/",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 137,
+                columnNumber: 28
+              }
+            })
+          );
+          return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 140,
+                columnNumber: 13
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+              className: "d-flex justify-content-center",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 141,
+                columnNumber: 15
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement("h4", {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 142,
+                columnNumber: 17
+              }
+            }, "My List of Favorites Movies")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 144,
+                columnNumber: 15
+              }
+            }, userDetails.FavoriteMovies && userDetails.FavoriteMovies.length > 0 ? /*#__PURE__*/_reactDefault.default.createElement(_movieListMovieListDefault.default, {
+              movies: movies.filter(movie => userDetails.FavoriteMovies && userDetails.FavoriteMovies.find(fav => fav === movie._id)),
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 146,
+                columnNumber: 17
+              }
+            }) : /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+              className: "d-flex justify-content-center p-5",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 148,
+                columnNumber: 17
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement("h6", {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 149,
+                columnNumber: 19
+              }
+            }, "Add movies to your favorites"))))
+          );
+        },
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 135,
+          columnNumber: 9
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
+        path: "/profile",
+        render: () => {
+          if (movies.length === 0) return (
+            /*#__PURE__*/_reactDefault.default.createElement("div", {
+              className: "main-view",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 157,
+                columnNumber: 43
+              }
+            })
+          );
+          if (!user) return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Redirect, {
+              to: "/",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 158,
+                columnNumber: 28
+              }
+            })
+          );
+          return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 160,
+                columnNumber: 13
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement(_profileViewProfileViewDefault.default, {
+              onLoggedOut: onLoggedOut,
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 161,
+                columnNumber: 15
+              }
+            }))
+          );
+        },
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 156,
+          columnNumber: 9
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
+        path: "/movies/:movieId",
+        render: ({match, history}) => {
+          if (movies.length === 0) return (
+            /*#__PURE__*/_reactDefault.default.createElement("div", {
+              className: "main-view",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 166,
+                columnNumber: 43
+              }
+            })
+          );
+          if (!user) return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Redirect, {
+              to: "/",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 167,
+                columnNumber: 28
+              }
+            })
+          );
+          return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 168,
+                columnNumber: 19
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement(_movieViewMovieViewDefault.default, {
+              movie: movies.find(movie => movie._id === match.params.movieId),
+              favorite: userDetails.FavoriteMovies && userDetails.FavoriteMovies.find(movie => movie === match.params.movieId),
+              onAddFavorite: onAddFavorite,
+              onDeleteFavorite: onDeleteFavorite,
+              onBackButton: () => history.goBack(),
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 169,
+                columnNumber: 13
+              }
+            }))
+          );
+        },
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 165,
+          columnNumber: 9
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
+        path: "/director/:name",
+        render: ({match, history}) => {
+          if (movies.length === 0) return (
+            /*#__PURE__*/_reactDefault.default.createElement("div", {
+              className: "main-view",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 179,
+                columnNumber: 43
+              }
+            })
+          );
+          if (!user) return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Redirect, {
+              to: "/",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 180,
+                columnNumber: 28
+              }
+            })
+          );
+          return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 182,
+                columnNumber: 13
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement(_directorViewDirectorViewDefault.default, {
+              director: movies.find(movie => movie.Director.Name === match.params.name).Director,
+              onBackButton: () => history.goBack(),
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 183,
+                columnNumber: 15
+              }
+            }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+              className: "d-flex justify-content-center",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 184,
+                columnNumber: 15
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement("h4", {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 185,
+                columnNumber: 17
+              }
+            }, match.params.name, "'s Movies")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+              className: "d-flex justify-content-center",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 187,
+                columnNumber: 15
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement(_movieListMovieListDefault.default, {
+              movies: movies.filter(movie => movie.Director.Name === match.params.name),
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 188,
+                columnNumber: 17
+              }
+            })))
+          );
+        },
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 178,
+          columnNumber: 9
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Route, {
+        path: "/genre/:name",
+        render: ({match, history}) => {
+          if (movies.length === 0) return (
+            /*#__PURE__*/_reactDefault.default.createElement("div", {
+              className: "main-view",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 194,
+                columnNumber: 43
+              }
+            })
+          );
+          if (!user) return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Redirect, {
+              to: "/",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 195,
+                columnNumber: 28
+              }
+            })
+          );
+          return (
+            /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 197,
+                columnNumber: 13
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement(_genreViewGenreViewDefault.default, {
+              genre: movies.find(movie => movie.Genre.Name === match.params.name).Genre,
+              onBackButton: () => history.goBack(),
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 198,
+                columnNumber: 15
+              }
+            }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+              className: "d-flex justify-content-center",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 199,
+                columnNumber: 15
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement("h4", {
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 200,
+                columnNumber: 17
+              }
+            }, match.params.name, " Movies")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+              className: "d-flex justify-content-center",
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 202,
+                columnNumber: 15
+              }
+            }, /*#__PURE__*/_reactDefault.default.createElement(_movieListMovieListDefault.default, {
+              movies: movies.filter(movie => movie.Genre.Name === match.params.name),
+              __self: this,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 203,
+                columnNumber: 17
+              }
+            })))
+          );
+        },
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 193,
+          columnNumber: 9
+        }
+      })), /*#__PURE__*/_reactDefault.default.createElement(_footerFooterDefault.default, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 209,
+          columnNumber: 7
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Alert, {
+        show: !!error,
+        className: "error-message",
+        variant: "secondary",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 210,
+          columnNumber: 7
+        }
+      }, error), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Alert, {
+        show: !!message,
+        className: "success-message",
+        variant: "primary",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 211,
+          columnNumber: 7
+        }
+      }, message))
+    );
   }
-  _s(MainView, "CxJ+1XX/MqMw0yekaWyToJerork=", false, function () {
-    return [_reactRedux.useDispatch, _hooksUseUserDetailsDefault.default, _hooksUseMoviesDefault.default, _reactRedux.useSelector, _reactRedux.useSelector, _reactRedux.useSelector];
+  _s(MainView, "JhCua0rXEslRQLv8Hn9kqDV5sw0=", false, function () {
+    return [_reactRedux.useDispatch, _hooksUseRequestDefault.default, _reactRedux.useSelector, _reactRedux.useSelector, _reactRedux.useSelector, _reactRedux.useSelector, _reactRedux.useSelector];
   });
   _c = MainView;
   ;
@@ -26530,7 +26932,7 @@ try {
   window.$RefreshSig$ = prevRefreshSig;
 }
 
-},{"react":"3b2NM","../movie-view/movie-view":"3xBbr","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","react-bootstrap":"4n7hB","../navigation/navigation":"Tqoul","../login-view/login-view":"6M7fu","../registration-view/registration-view":"7gvH2","./main-view.scss":"3X8QW","react-router-dom":"1PMSK","../director-view/director-view":"7HF27","../genre-view/genre-view":"6FLqj","../profile-view/profile-view":"3CncI","react-redux":"7GDa4","../../redux/actions/actions":"2QXPk","../footer/footer":"3w8G1","../movie-list/movie-list":"54YBA","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","../loading/loading":"6sHXG","../favorites-view/favorites-view":"76eej","../../hooks/useUserDetails":"1NB9z","../../hooks/useMovies":"7L5z8"}],"3xBbr":[function(require,module,exports) {
+},{"react":"3b2NM","../movie-view/movie-view":"3xBbr","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","react-bootstrap":"4n7hB","../navigation/navigation":"Tqoul","../login-view/login-view":"6M7fu","../registration-view/registration-view":"7gvH2","../../hooks/useRequest":"2iXqm","./main-view.scss":"3X8QW","react-router-dom":"1PMSK","../director-view/director-view":"7HF27","../genre-view/genre-view":"6FLqj","../profile-view/profile-view":"3CncI","react-redux":"7GDa4","../../redux/actions/actions":"2QXPk","../footer/footer":"3w8G1","../movie-list/movie-list":"54YBA","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f"}],"3xBbr":[function(require,module,exports) {
 var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -26540,13 +26942,11 @@ try {
   _parcelHelpers.defineInteropFlag(exports);
   var _react = require('react');
   var _reactDefault = _parcelHelpers.interopDefault(_react);
-  var _reactRedux = require('react-redux');
+  var _propTypes = require('prop-types');
+  var _propTypesDefault = _parcelHelpers.interopDefault(_propTypes);
   var _reactBootstrap = require('react-bootstrap');
   var _reactPalette = require('react-palette');
   var _reactRouterDom = require('react-router-dom');
-  var _hooksUseRequest = require('../../hooks/useRequest');
-  var _hooksUseRequestDefault = _parcelHelpers.interopDefault(_hooksUseRequest);
-  var _reduxActionsActions = require('../../redux/actions/actions');
   require('./movie-view.scss');
   var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/movie-view/movie-view.jsx", _s = $RefreshSig$();
   const styles = {
@@ -26556,42 +26956,15 @@ try {
   };
   function MovieView(props) {
     _s();
-    const apiRequest = _hooksUseRequestDefault.default();
-    const dispatch = _reactRedux.useDispatch();
-    const {history, match} = props;
-    const movies = _reactRedux.useSelector(state => state.movies);
-    const userDetails = _reactRedux.useSelector(state => state.userDetails);
-    const user = _reactRedux.useSelector(state => state.user);
-    const movie = movies.length > 0 && movies.find(movie => movie._id === match.params.movieId);
-    const favorite = userDetails.FavoriteMovies && userDetails.FavoriteMovies.find(movie => movie === match.params.movieId);
+    const {movie, onBackButton, favorite, onAddFavorite, onDeleteFavorite} = props;
     const {data} = _reactPalette.usePalette(movie.ImagePath);
-    const onAddFavorite = async movie => {
-      try {
-        const response = await apiRequest('POST', `/users/${user}/favorites/${movie}`);
-        dispatch(_reduxActionsActions.setUserDetails(response.data));
-        dispatch(_reduxActionsActions.setMessage(response.message));
-      } catch (error) {
-        console.log(error);
-        dispatch(_reduxActionsActions.setError(error));
-      }
-    };
-    const onDeleteFavorite = async movie => {
-      try {
-        const response = await apiRequest('DELETE', `/users/${user}/favorites/${movie}`);
-        dispatch(_reduxActionsActions.setUserDetails(response.data));
-        dispatch(_reduxActionsActions.setMessage(response.message));
-      } catch (error) {
-        console.log(error);
-        dispatch(_reduxActionsActions.setError(error));
-      }
-    };
     return (
       /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         className: "movie-view",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 51,
+          lineNumber: 20,
           columnNumber: 5
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
@@ -26601,16 +26974,16 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 52,
+          lineNumber: 21,
           columnNumber: 7
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Image, {
         className: "movie-view__image",
-        src: movie?.ImagePath,
+        src: movie.ImagePath,
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 53,
+          lineNumber: 22,
           columnNumber: 10
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
@@ -26619,7 +26992,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 55,
+          lineNumber: 24,
           columnNumber: 7
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
@@ -26627,7 +27000,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 56,
+          lineNumber: 25,
           columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
@@ -26635,14 +27008,14 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 57,
+          lineNumber: 26,
           columnNumber: 11
         }
-      }, "Title: ", movie?.Title)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+      }, "Title: ", movie.Title)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 61,
+          lineNumber: 30,
           columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
@@ -26650,7 +27023,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 62,
+          lineNumber: 31,
           columnNumber: 11
         }
       }, /*#__PURE__*/_reactDefault.default.createElement("span", {
@@ -26658,7 +27031,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 63,
+          lineNumber: 32,
           columnNumber: 13
         }
       }, "Genre: "), /*#__PURE__*/_reactDefault.default.createElement("span", {
@@ -26666,22 +27039,22 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 64,
+          lineNumber: 33,
           columnNumber: 13
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Link, {
-        to: `/genre/${movie?.Genre?.Name}`,
+        to: `/genre/${movie.Genre.Name}`,
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 64,
+          lineNumber: 33,
           columnNumber: 37
         }
-      }, movie?.Genre?.Name)))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+      }, movie.Genre.Name)))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 67,
+          lineNumber: 36,
           columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
@@ -26689,7 +27062,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 68,
+          lineNumber: 37,
           columnNumber: 11
         }
       }, /*#__PURE__*/_reactDefault.default.createElement("span", {
@@ -26697,7 +27070,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 69,
+          lineNumber: 38,
           columnNumber: 13
         }
       }, "Director: "), /*#__PURE__*/_reactDefault.default.createElement("span", {
@@ -26705,22 +27078,22 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 70,
+          lineNumber: 39,
           columnNumber: 13
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Link, {
-        to: `/director/${movie?.Director?.Name}`,
+        to: `/director/${movie.Director.Name}`,
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 70,
+          lineNumber: 39,
           columnNumber: 37
         }
-      }, movie?.Director?.Name)))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+      }, movie.Director.Name)))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 73,
+          lineNumber: 42,
           columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
@@ -26728,7 +27101,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 74,
+          lineNumber: 43,
           columnNumber: 11
         }
       }, /*#__PURE__*/_reactDefault.default.createElement("span", {
@@ -26736,7 +27109,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 75,
+          lineNumber: 44,
           columnNumber: 13
         }
       }, "Description: "), /*#__PURE__*/_reactDefault.default.createElement("span", {
@@ -26744,30 +27117,30 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 76,
+          lineNumber: 45,
           columnNumber: 13
         }
-      }, movie?.Description))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+      }, movie.Description))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 79,
+          lineNumber: 48,
           columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 80,
+          lineNumber: 49,
           columnNumber: 11
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
-        onClick: () => history.goBack(),
+        onClick: onBackButton,
         className: "m-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 81,
+          lineNumber: 50,
           columnNumber: 13
         }
       }, "Back"), favorite ? /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
@@ -26776,7 +27149,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 83,
+          lineNumber: 52,
           columnNumber: 13
         }
       }, "Delete From Favorites") : /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
@@ -26785,16 +27158,30 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 85,
+          lineNumber: 54,
           columnNumber: 13
         }
       }, "Add to Favorites")))))
     );
   }
-  _s(MovieView, "e/18D/SqijpT9TH1d7ry6tcyuos=", false, function () {
-    return [_hooksUseRequestDefault.default, _reactRedux.useDispatch, _reactRedux.useSelector, _reactRedux.useSelector, _reactRedux.useSelector, _reactPalette.usePalette];
+  _s(MovieView, "6yQ1nauUca3FZ7VlrvtBwBz/pCc=", false, function () {
+    return [_reactPalette.usePalette];
   });
   _c = MovieView;
+  MovieView.propTypes = {
+    movie: _propTypesDefault.default.shape({
+      Title: _propTypesDefault.default.string.isRequired,
+      Description: _propTypesDefault.default.string.isRequired,
+      Genre: _propTypesDefault.default.shape({
+        Name: _propTypesDefault.default.string.isRequired
+      }),
+      Director: _propTypesDefault.default.shape({
+        Name: _propTypesDefault.default.string.isRequired
+      }),
+      ImagePath: _propTypesDefault.default.string.isRequired
+    }).isRequired,
+    onBackButton: _propTypesDefault.default.func.isRequired
+  };
   exports.default = MovieView;
   var _c;
   $RefreshReg$(_c, "MovieView");
@@ -26804,7 +27191,7 @@ try {
   window.$RefreshSig$ = prevRefreshSig;
 }
 
-},{"react":"3b2NM","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","react-bootstrap":"4n7hB","react-palette":"6iJ3x","./movie-view.scss":"4iZ2Z","react-router-dom":"1PMSK","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","react-redux":"7GDa4","../../hooks/useRequest":"2iXqm","../../redux/actions/actions":"2QXPk"}],"5gA8y":[function(require,module,exports) {
+},{"react":"3b2NM","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","react-bootstrap":"4n7hB","react-palette":"6iJ3x","./movie-view.scss":"4iZ2Z","prop-types":"4dfy5","react-router-dom":"1PMSK","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f"}],"5gA8y":[function(require,module,exports) {
 "use strict";
 
 exports.interopDefault = function (a) {
@@ -52914,7 +53301,202 @@ function registerExportsForReactRefresh(module) {
   }
 }
 
-},{"react-refresh/runtime":"592mh"}],"7GDa4":[function(require,module,exports) {
+},{"react-refresh/runtime":"592mh"}],"Tqoul":[function(require,module,exports) {
+var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+helpers.prelude(module);
+try {
+  var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+  _parcelHelpers.defineInteropFlag(exports);
+  var _react = require('react');
+  var _reactDefault = _parcelHelpers.interopDefault(_react);
+  var _reactBootstrap = require('react-bootstrap');
+  var _reactRouterDom = require('react-router-dom');
+  var _propTypes = require('prop-types');
+  var _propTypesDefault = _parcelHelpers.interopDefault(_propTypes);
+  var _visibilityFilterInputVisibilityFilterInput = require('../visibility-filter-input/visibility-filter-input');
+  var _visibilityFilterInputVisibilityFilterInputDefault = _parcelHelpers.interopDefault(_visibilityFilterInputVisibilityFilterInput);
+  require('./navigation.scss');
+  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/navigation/navigation.jsx";
+  function Navigation(props) {
+    const {user, onLoggedOut} = props;
+    return (
+      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Navbar, {
+        className: "navigation",
+        collapseOnSelect: true,
+        expand: "lg",
+        bg: "secondary",
+        variant: "primary",
+        sticky: "top",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 12,
+          columnNumber: 5
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Navbar.Brand, {
+        as: _reactRouterDom.Link,
+        to: "/",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 13,
+          columnNumber: 7
+        }
+      }, "MYFLIX APP"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Navbar.Toggle, {
+        "aria-controls": "responsive-navbar-nav",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 14,
+          columnNumber: 7
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Navbar.Collapse, {
+        id: "responsive-navbar-nav",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 15,
+          columnNumber: 7
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Nav, {
+        className: "mr-auto",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 16,
+          columnNumber: 9
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Nav.Link, {
+        as: _reactRouterDom.Link,
+        to: "/",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 17,
+          columnNumber: 11
+        }
+      }, "Home"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Nav.Link, {
+        as: _reactRouterDom.Link,
+        to: "/myfavorites",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 18,
+          columnNumber: 11
+        }
+      }, "Favorites")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Nav, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 20,
+          columnNumber: 9
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_visibilityFilterInputVisibilityFilterInputDefault.default, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 21,
+          columnNumber: 11
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.NavDropdown, {
+        title: `${user}'s Profile`,
+        id: "basic-nav-dropdown",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 22,
+          columnNumber: 11
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.NavDropdown.Item, {
+        as: _reactRouterDom.Link,
+        to: `/profile`,
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 23,
+          columnNumber: 11
+        }
+      }, "My Profile"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.NavDropdown.Divider, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 24,
+          columnNumber: 11
+        }
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.NavDropdown.Item, {
+        onClick: onLoggedOut,
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 25,
+          columnNumber: 11
+        }
+      }, "Log Out")))))
+    );
+  }
+  _c = Navigation;
+  Navigation.propTypes = {
+    onLoggedOut: _propTypesDefault.default.func.isRequired,
+    user: _propTypesDefault.default.string.isRequired
+  };
+  exports.default = Navigation;
+  var _c;
+  $RefreshReg$(_c, "Navigation");
+  helpers.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+},{"react":"3b2NM","react-bootstrap":"4n7hB","./navigation.scss":"4lNlM","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","react-router-dom":"1PMSK","../visibility-filter-input/visibility-filter-input":"3SRLP","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","prop-types":"4dfy5"}],"4lNlM":[function() {},{}],"3SRLP":[function(require,module,exports) {
+var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+helpers.prelude(module);
+try {
+  var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+  _parcelHelpers.defineInteropFlag(exports);
+  var _react = require('react');
+  var _reactDefault = _parcelHelpers.interopDefault(_react);
+  var _reactRedux = require('react-redux');
+  var _reduxActionsActions = require('../../redux/actions/actions');
+  var _reactBootstrapForm = require('react-bootstrap/Form');
+  var _reactBootstrapFormDefault = _parcelHelpers.interopDefault(_reactBootstrapForm);
+  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/visibility-filter-input/visibility-filter-input.jsx", _s = $RefreshSig$();
+  function VisibilityFilterInput(props) {
+    _s();
+    const dispatch = _reactRedux.useDispatch();
+    const visibilityFilter = _reactRedux.useSelector(state => state.visibilityFilter);
+    return (
+      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapFormDefault.default.Control, {
+        onChange: e => dispatch(_reduxActionsActions.setFilter(e.target.value)),
+        value: visibilityFilter,
+        placeholder: "Search",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 10,
+          columnNumber: 10
+        }
+      })
+    );
+  }
+  _s(VisibilityFilterInput, "uGspsobeGD5Ye1cSkfHTIf9LaIs=", false, function () {
+    return [_reactRedux.useDispatch, _reactRedux.useSelector];
+  });
+  _c = VisibilityFilterInput;
+  exports.default = VisibilityFilterInput;
+  var _c;
+  $RefreshReg$(_c, "VisibilityFilterInput");
+  helpers.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+},{"react":"3b2NM","react-redux":"7GDa4","../../redux/actions/actions":"2QXPk","react-bootstrap/Form":"6A5ko","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f"}],"7GDa4":[function(require,module,exports) {
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -54315,1786 +54897,7 @@ exports.unstable_batchedUpdates = void 0;
 var _reactDom = require("react-dom");
 
 exports.unstable_batchedUpdates = _reactDom.unstable_batchedUpdates;
-},{"react-dom":"2sg1U"}],"2iXqm":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-var _axios = require('axios');
-var _axiosDefault = _parcelHelpers.interopDefault(_axios);
-var _utilsApi = require('../utils/api');
-var _utilsApiDefault = _parcelHelpers.interopDefault(_utilsApi);
-function useRequest() {
-  const apiRequest = async (method, path, data = null, token) => {
-    const accessToken = token ? token : localStorage.getItem('token');
-    try {
-      const response = await _axiosDefault.default({
-        method,
-        url: `${_utilsApiDefault.default}${path}`,
-        data,
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
-      return response.data;
-    } catch (error) {
-      throw error.response ? error.response.data.message : "Ops! Something happened";
-    }
-  };
-  return apiRequest;
-}
-exports.default = useRequest;
-
-},{"axios":"7rA65","../utils/api":"AWzhP","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"7rA65":[function(require,module,exports) {
-module.exports = require('./lib/axios');
-},{"./lib/axios":"4qfhW"}],"4qfhW":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./utils');
-var bind = require('./helpers/bind');
-var Axios = require('./core/Axios');
-var mergeConfig = require('./core/mergeConfig');
-var defaults = require('./defaults');
-
-/**
- * Create an instance of Axios
- *
- * @param {Object} defaultConfig The default config for the instance
- * @return {Axios} A new instance of Axios
- */
-function createInstance(defaultConfig) {
-  var context = new Axios(defaultConfig);
-  var instance = bind(Axios.prototype.request, context);
-
-  // Copy axios.prototype to instance
-  utils.extend(instance, Axios.prototype, context);
-
-  // Copy context to instance
-  utils.extend(instance, context);
-
-  return instance;
-}
-
-// Create the default instance to be exported
-var axios = createInstance(defaults);
-
-// Expose Axios class to allow class inheritance
-axios.Axios = Axios;
-
-// Factory for creating new instances
-axios.create = function create(instanceConfig) {
-  return createInstance(mergeConfig(axios.defaults, instanceConfig));
-};
-
-// Expose Cancel & CancelToken
-axios.Cancel = require('./cancel/Cancel');
-axios.CancelToken = require('./cancel/CancelToken');
-axios.isCancel = require('./cancel/isCancel');
-
-// Expose all/spread
-axios.all = function all(promises) {
-  return Promise.all(promises);
-};
-axios.spread = require('./helpers/spread');
-
-// Expose isAxiosError
-axios.isAxiosError = require('./helpers/isAxiosError');
-
-module.exports = axios;
-
-// Allow use of default import syntax in TypeScript
-module.exports.default = axios;
-
-},{"./utils":"7J9rV","./helpers/bind":"78Fwk","./core/Axios":"26bz2","./core/mergeConfig":"42z1a","./defaults":"5j10E","./cancel/Cancel":"1Ql7i","./cancel/CancelToken":"hHamf","./cancel/isCancel":"3MAgn","./helpers/spread":"9FoXt","./helpers/isAxiosError":"1bzv8"}],"7J9rV":[function(require,module,exports) {
-'use strict';
-
-var bind = require('./helpers/bind');
-
-/*global toString:true*/
-
-// utils is a library of generic helper functions non-specific to axios
-
-var toString = Object.prototype.toString;
-
-/**
- * Determine if a value is an Array
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Array, otherwise false
- */
-function isArray(val) {
-  return toString.call(val) === '[object Array]';
-}
-
-/**
- * Determine if a value is undefined
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if the value is undefined, otherwise false
- */
-function isUndefined(val) {
-  return typeof val === 'undefined';
-}
-
-/**
- * Determine if a value is a Buffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Buffer, otherwise false
- */
-function isBuffer(val) {
-  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
-    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
-}
-
-/**
- * Determine if a value is an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an ArrayBuffer, otherwise false
- */
-function isArrayBuffer(val) {
-  return toString.call(val) === '[object ArrayBuffer]';
-}
-
-/**
- * Determine if a value is a FormData
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an FormData, otherwise false
- */
-function isFormData(val) {
-  return (typeof FormData !== 'undefined') && (val instanceof FormData);
-}
-
-/**
- * Determine if a value is a view on an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
- */
-function isArrayBufferView(val) {
-  var result;
-  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
-    result = ArrayBuffer.isView(val);
-  } else {
-    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
-  }
-  return result;
-}
-
-/**
- * Determine if a value is a String
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a String, otherwise false
- */
-function isString(val) {
-  return typeof val === 'string';
-}
-
-/**
- * Determine if a value is a Number
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Number, otherwise false
- */
-function isNumber(val) {
-  return typeof val === 'number';
-}
-
-/**
- * Determine if a value is an Object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Object, otherwise false
- */
-function isObject(val) {
-  return val !== null && typeof val === 'object';
-}
-
-/**
- * Determine if a value is a plain Object
- *
- * @param {Object} val The value to test
- * @return {boolean} True if value is a plain Object, otherwise false
- */
-function isPlainObject(val) {
-  if (toString.call(val) !== '[object Object]') {
-    return false;
-  }
-
-  var prototype = Object.getPrototypeOf(val);
-  return prototype === null || prototype === Object.prototype;
-}
-
-/**
- * Determine if a value is a Date
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Date, otherwise false
- */
-function isDate(val) {
-  return toString.call(val) === '[object Date]';
-}
-
-/**
- * Determine if a value is a File
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a File, otherwise false
- */
-function isFile(val) {
-  return toString.call(val) === '[object File]';
-}
-
-/**
- * Determine if a value is a Blob
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Blob, otherwise false
- */
-function isBlob(val) {
-  return toString.call(val) === '[object Blob]';
-}
-
-/**
- * Determine if a value is a Function
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Function, otherwise false
- */
-function isFunction(val) {
-  return toString.call(val) === '[object Function]';
-}
-
-/**
- * Determine if a value is a Stream
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Stream, otherwise false
- */
-function isStream(val) {
-  return isObject(val) && isFunction(val.pipe);
-}
-
-/**
- * Determine if a value is a URLSearchParams object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a URLSearchParams object, otherwise false
- */
-function isURLSearchParams(val) {
-  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
-}
-
-/**
- * Trim excess whitespace off the beginning and end of a string
- *
- * @param {String} str The String to trim
- * @returns {String} The String freed of excess whitespace
- */
-function trim(str) {
-  return str.replace(/^\s*/, '').replace(/\s*$/, '');
-}
-
-/**
- * Determine if we're running in a standard browser environment
- *
- * This allows axios to run in a web worker, and react-native.
- * Both environments support XMLHttpRequest, but not fully standard globals.
- *
- * web workers:
- *  typeof window -> undefined
- *  typeof document -> undefined
- *
- * react-native:
- *  navigator.product -> 'ReactNative'
- * nativescript
- *  navigator.product -> 'NativeScript' or 'NS'
- */
-function isStandardBrowserEnv() {
-  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
-                                           navigator.product === 'NativeScript' ||
-                                           navigator.product === 'NS')) {
-    return false;
-  }
-  return (
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined'
-  );
-}
-
-/**
- * Iterate over an Array or an Object invoking a function for each item.
- *
- * If `obj` is an Array callback will be called passing
- * the value, index, and complete array for each item.
- *
- * If 'obj' is an Object callback will be called passing
- * the value, key, and complete object for each property.
- *
- * @param {Object|Array} obj The object to iterate
- * @param {Function} fn The callback to invoke for each item
- */
-function forEach(obj, fn) {
-  // Don't bother if no value provided
-  if (obj === null || typeof obj === 'undefined') {
-    return;
-  }
-
-  // Force an array if not already something iterable
-  if (typeof obj !== 'object') {
-    /*eslint no-param-reassign:0*/
-    obj = [obj];
-  }
-
-  if (isArray(obj)) {
-    // Iterate over array values
-    for (var i = 0, l = obj.length; i < l; i++) {
-      fn.call(null, obj[i], i, obj);
-    }
-  } else {
-    // Iterate over object keys
-    for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        fn.call(null, obj[key], key, obj);
-      }
-    }
-  }
-}
-
-/**
- * Accepts varargs expecting each argument to be an object, then
- * immutably merges the properties of each object and returns result.
- *
- * When multiple objects contain the same key the later object in
- * the arguments list will take precedence.
- *
- * Example:
- *
- * ```js
- * var result = merge({foo: 123}, {foo: 456});
- * console.log(result.foo); // outputs 456
- * ```
- *
- * @param {Object} obj1 Object to merge
- * @returns {Object} Result of all merge properties
- */
-function merge(/* obj1, obj2, obj3, ... */) {
-  var result = {};
-  function assignValue(val, key) {
-    if (isPlainObject(result[key]) && isPlainObject(val)) {
-      result[key] = merge(result[key], val);
-    } else if (isPlainObject(val)) {
-      result[key] = merge({}, val);
-    } else if (isArray(val)) {
-      result[key] = val.slice();
-    } else {
-      result[key] = val;
-    }
-  }
-
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue);
-  }
-  return result;
-}
-
-/**
- * Extends object a by mutably adding to it the properties of object b.
- *
- * @param {Object} a The object to be extended
- * @param {Object} b The object to copy properties from
- * @param {Object} thisArg The object to bind function to
- * @return {Object} The resulting value of object a
- */
-function extend(a, b, thisArg) {
-  forEach(b, function assignValue(val, key) {
-    if (thisArg && typeof val === 'function') {
-      a[key] = bind(val, thisArg);
-    } else {
-      a[key] = val;
-    }
-  });
-  return a;
-}
-
-/**
- * Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
- *
- * @param {string} content with BOM
- * @return {string} content value without BOM
- */
-function stripBOM(content) {
-  if (content.charCodeAt(0) === 0xFEFF) {
-    content = content.slice(1);
-  }
-  return content;
-}
-
-module.exports = {
-  isArray: isArray,
-  isArrayBuffer: isArrayBuffer,
-  isBuffer: isBuffer,
-  isFormData: isFormData,
-  isArrayBufferView: isArrayBufferView,
-  isString: isString,
-  isNumber: isNumber,
-  isObject: isObject,
-  isPlainObject: isPlainObject,
-  isUndefined: isUndefined,
-  isDate: isDate,
-  isFile: isFile,
-  isBlob: isBlob,
-  isFunction: isFunction,
-  isStream: isStream,
-  isURLSearchParams: isURLSearchParams,
-  isStandardBrowserEnv: isStandardBrowserEnv,
-  forEach: forEach,
-  merge: merge,
-  extend: extend,
-  trim: trim,
-  stripBOM: stripBOM
-};
-
-},{"./helpers/bind":"78Fwk"}],"78Fwk":[function(require,module,exports) {
-'use strict';
-
-module.exports = function bind(fn, thisArg) {
-  return function wrap() {
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-    return fn.apply(thisArg, args);
-  };
-};
-
-},{}],"26bz2":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-var buildURL = require('../helpers/buildURL');
-var InterceptorManager = require('./InterceptorManager');
-var dispatchRequest = require('./dispatchRequest');
-var mergeConfig = require('./mergeConfig');
-
-/**
- * Create a new instance of Axios
- *
- * @param {Object} instanceConfig The default config for the instance
- */
-function Axios(instanceConfig) {
-  this.defaults = instanceConfig;
-  this.interceptors = {
-    request: new InterceptorManager(),
-    response: new InterceptorManager()
-  };
-}
-
-/**
- * Dispatch a request
- *
- * @param {Object} config The config specific for this request (merged with this.defaults)
- */
-Axios.prototype.request = function request(config) {
-  /*eslint no-param-reassign:0*/
-  // Allow for axios('example/url'[, config]) a la fetch API
-  if (typeof config === 'string') {
-    config = arguments[1] || {};
-    config.url = arguments[0];
-  } else {
-    config = config || {};
-  }
-
-  config = mergeConfig(this.defaults, config);
-
-  // Set config.method
-  if (config.method) {
-    config.method = config.method.toLowerCase();
-  } else if (this.defaults.method) {
-    config.method = this.defaults.method.toLowerCase();
-  } else {
-    config.method = 'get';
-  }
-
-  // Hook up interceptors middleware
-  var chain = [dispatchRequest, undefined];
-  var promise = Promise.resolve(config);
-
-  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-    chain.unshift(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-    chain.push(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  while (chain.length) {
-    promise = promise.then(chain.shift(), chain.shift());
-  }
-
-  return promise;
-};
-
-Axios.prototype.getUri = function getUri(config) {
-  config = mergeConfig(this.defaults, config);
-  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
-};
-
-// Provide aliases for supported request methods
-utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, config) {
-    return this.request(mergeConfig(config || {}, {
-      method: method,
-      url: url,
-      data: (config || {}).data
-    }));
-  };
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, data, config) {
-    return this.request(mergeConfig(config || {}, {
-      method: method,
-      url: url,
-      data: data
-    }));
-  };
-});
-
-module.exports = Axios;
-
-},{"./../utils":"7J9rV","../helpers/buildURL":"25KfR","./InterceptorManager":"33sRR","./dispatchRequest":"1mCjo","./mergeConfig":"42z1a"}],"25KfR":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-function encode(val) {
-  return encodeURIComponent(val).
-    replace(/%3A/gi, ':').
-    replace(/%24/g, '$').
-    replace(/%2C/gi, ',').
-    replace(/%20/g, '+').
-    replace(/%5B/gi, '[').
-    replace(/%5D/gi, ']');
-}
-
-/**
- * Build a URL by appending params to the end
- *
- * @param {string} url The base of the url (e.g., http://www.google.com)
- * @param {object} [params] The params to be appended
- * @returns {string} The formatted url
- */
-module.exports = function buildURL(url, params, paramsSerializer) {
-  /*eslint no-param-reassign:0*/
-  if (!params) {
-    return url;
-  }
-
-  var serializedParams;
-  if (paramsSerializer) {
-    serializedParams = paramsSerializer(params);
-  } else if (utils.isURLSearchParams(params)) {
-    serializedParams = params.toString();
-  } else {
-    var parts = [];
-
-    utils.forEach(params, function serialize(val, key) {
-      if (val === null || typeof val === 'undefined') {
-        return;
-      }
-
-      if (utils.isArray(val)) {
-        key = key + '[]';
-      } else {
-        val = [val];
-      }
-
-      utils.forEach(val, function parseValue(v) {
-        if (utils.isDate(v)) {
-          v = v.toISOString();
-        } else if (utils.isObject(v)) {
-          v = JSON.stringify(v);
-        }
-        parts.push(encode(key) + '=' + encode(v));
-      });
-    });
-
-    serializedParams = parts.join('&');
-  }
-
-  if (serializedParams) {
-    var hashmarkIndex = url.indexOf('#');
-    if (hashmarkIndex !== -1) {
-      url = url.slice(0, hashmarkIndex);
-    }
-
-    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
-  }
-
-  return url;
-};
-
-},{"./../utils":"7J9rV"}],"33sRR":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-function InterceptorManager() {
-  this.handlers = [];
-}
-
-/**
- * Add a new interceptor to the stack
- *
- * @param {Function} fulfilled The function to handle `then` for a `Promise`
- * @param {Function} rejected The function to handle `reject` for a `Promise`
- *
- * @return {Number} An ID used to remove interceptor later
- */
-InterceptorManager.prototype.use = function use(fulfilled, rejected) {
-  this.handlers.push({
-    fulfilled: fulfilled,
-    rejected: rejected
-  });
-  return this.handlers.length - 1;
-};
-
-/**
- * Remove an interceptor from the stack
- *
- * @param {Number} id The ID that was returned by `use`
- */
-InterceptorManager.prototype.eject = function eject(id) {
-  if (this.handlers[id]) {
-    this.handlers[id] = null;
-  }
-};
-
-/**
- * Iterate over all the registered interceptors
- *
- * This method is particularly useful for skipping over any
- * interceptors that may have become `null` calling `eject`.
- *
- * @param {Function} fn The function to call for each interceptor
- */
-InterceptorManager.prototype.forEach = function forEach(fn) {
-  utils.forEach(this.handlers, function forEachHandler(h) {
-    if (h !== null) {
-      fn(h);
-    }
-  });
-};
-
-module.exports = InterceptorManager;
-
-},{"./../utils":"7J9rV"}],"1mCjo":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-var transformData = require('./transformData');
-var isCancel = require('../cancel/isCancel');
-var defaults = require('../defaults');
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-function throwIfCancellationRequested(config) {
-  if (config.cancelToken) {
-    config.cancelToken.throwIfRequested();
-  }
-}
-
-/**
- * Dispatch a request to the server using the configured adapter.
- *
- * @param {object} config The config that is to be used for the request
- * @returns {Promise} The Promise to be fulfilled
- */
-module.exports = function dispatchRequest(config) {
-  throwIfCancellationRequested(config);
-
-  // Ensure headers exist
-  config.headers = config.headers || {};
-
-  // Transform request data
-  config.data = transformData(
-    config.data,
-    config.headers,
-    config.transformRequest
-  );
-
-  // Flatten headers
-  config.headers = utils.merge(
-    config.headers.common || {},
-    config.headers[config.method] || {},
-    config.headers
-  );
-
-  utils.forEach(
-    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-    function cleanHeaderConfig(method) {
-      delete config.headers[method];
-    }
-  );
-
-  var adapter = config.adapter || defaults.adapter;
-
-  return adapter(config).then(function onAdapterResolution(response) {
-    throwIfCancellationRequested(config);
-
-    // Transform response data
-    response.data = transformData(
-      response.data,
-      response.headers,
-      config.transformResponse
-    );
-
-    return response;
-  }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
-      throwIfCancellationRequested(config);
-
-      // Transform response data
-      if (reason && reason.response) {
-        reason.response.data = transformData(
-          reason.response.data,
-          reason.response.headers,
-          config.transformResponse
-        );
-      }
-    }
-
-    return Promise.reject(reason);
-  });
-};
-
-},{"./../utils":"7J9rV","./transformData":"1ueU6","../cancel/isCancel":"3MAgn","../defaults":"5j10E"}],"1ueU6":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-/**
- * Transform the data for a request or a response
- *
- * @param {Object|String} data The data to be transformed
- * @param {Array} headers The headers for the request or response
- * @param {Array|Function} fns A single function or Array of functions
- * @returns {*} The resulting transformed data
- */
-module.exports = function transformData(data, headers, fns) {
-  /*eslint no-param-reassign:0*/
-  utils.forEach(fns, function transform(fn) {
-    data = fn(data, headers);
-  });
-
-  return data;
-};
-
-},{"./../utils":"7J9rV"}],"3MAgn":[function(require,module,exports) {
-'use strict';
-
-module.exports = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
-};
-
-},{}],"5j10E":[function(require,module,exports) {
-"use strict";
-var process = require("process");
-var utils = require('./utils');
-var normalizeHeaderName = require('./helpers/normalizeHeaderName');
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-function getDefaultAdapter() {
-  var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = require('./adapters/xhr');
-  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
-    // For node use HTTP adapter
-    adapter = require('./adapters/http');
-  }
-  return adapter;
-}
-var defaults = {
-  adapter: getDefaultAdapter(),
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Accept');
-    normalizeHeaderName(headers, 'Content-Type');
-    if (utils.isFormData(data) || utils.isArrayBuffer(data) || utils.isBuffer(data) || utils.isStream(data) || utils.isFile(data) || utils.isBlob(data)) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
-    }
-    return data;
-  }],
-  transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
-      try {
-        data = JSON.parse(data);
-      } catch (e) {}
-    }
-    return data;
-  }],
-  /**
-  * A timeout in milliseconds to abort a request. If set to 0 (default) a
-  * timeout is not created.
-  */
-  timeout: 0,
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-  maxContentLength: -1,
-  maxBodyLength: -1,
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  }
-};
-defaults.headers = {
-  common: {
-    'Accept': 'application/json, text/plain, */*'
-  }
-};
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-  defaults.headers[method] = {};
-});
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-module.exports = defaults;
-
-},{"process":"7AgFc","./utils":"7J9rV","./helpers/normalizeHeaderName":"5yMqL","./adapters/xhr":"6pJqL","./adapters/http":"6pJqL"}],"7AgFc":[function(require,module,exports) {
-// shim for using process in browser
-var process = module.exports = {};
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-var cachedSetTimeout;
-var cachedClearTimeout;
-function defaultSetTimout() {
-  throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout() {
-  throw new Error('clearTimeout has not been defined');
-}
-(function () {
-  try {
-    if (typeof setTimeout === 'function') {
-      cachedSetTimeout = setTimeout;
-    } else {
-      cachedSetTimeout = defaultSetTimout;
-    }
-  } catch (e) {
-    cachedSetTimeout = defaultSetTimout;
-  }
-  try {
-    if (typeof clearTimeout === 'function') {
-      cachedClearTimeout = clearTimeout;
-    } else {
-      cachedClearTimeout = defaultClearTimeout;
-    }
-  } catch (e) {
-    cachedClearTimeout = defaultClearTimeout;
-  }
-})();
-function runTimeout(fun) {
-  if (cachedSetTimeout === setTimeout) {
-    // normal enviroments in sane situations
-    return setTimeout(fun, 0);
-  }
-  // if setTimeout wasn't available but was latter defined
-  if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-    cachedSetTimeout = setTimeout;
-    return setTimeout(fun, 0);
-  }
-  try {
-    // when when somebody has screwed with setTimeout but no I.E. maddness
-    return cachedSetTimeout(fun, 0);
-  } catch (e) {
-    try {
-      // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-      return cachedSetTimeout.call(null, fun, 0);
-    } catch (e) {
-      // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-      return cachedSetTimeout.call(this, fun, 0);
-    }
-  }
-}
-function runClearTimeout(marker) {
-  if (cachedClearTimeout === clearTimeout) {
-    // normal enviroments in sane situations
-    return clearTimeout(marker);
-  }
-  // if clearTimeout wasn't available but was latter defined
-  if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-    cachedClearTimeout = clearTimeout;
-    return clearTimeout(marker);
-  }
-  try {
-    // when when somebody has screwed with setTimeout but no I.E. maddness
-    return cachedClearTimeout(marker);
-  } catch (e) {
-    try {
-      // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-      return cachedClearTimeout.call(null, marker);
-    } catch (e) {
-      // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-      // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-      return cachedClearTimeout.call(this, marker);
-    }
-  }
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-function cleanUpNextTick() {
-  if (!draining || !currentQueue) {
-    return;
-  }
-  draining = false;
-  if (currentQueue.length) {
-    queue = currentQueue.concat(queue);
-  } else {
-    queueIndex = -1;
-  }
-  if (queue.length) {
-    drainQueue();
-  }
-}
-function drainQueue() {
-  if (draining) {
-    return;
-  }
-  var timeout = runTimeout(cleanUpNextTick);
-  draining = true;
-  var len = queue.length;
-  while (len) {
-    currentQueue = queue;
-    queue = [];
-    while (++queueIndex < len) {
-      if (currentQueue) {
-        currentQueue[queueIndex].run();
-      }
-    }
-    queueIndex = -1;
-    len = queue.length;
-  }
-  currentQueue = null;
-  draining = false;
-  runClearTimeout(timeout);
-}
-process.nextTick = function (fun) {
-  var args = new Array(arguments.length - 1);
-  if (arguments.length > 1) {
-    for (var i = 1; i < arguments.length; i++) {
-      args[i - 1] = arguments[i];
-    }
-  }
-  queue.push(new Item(fun, args));
-  if (queue.length === 1 && !draining) {
-    runTimeout(drainQueue);
-  }
-};
-// v8 likes predictible objects
-function Item(fun, array) {
-  this.fun = fun;
-  this.array = array;
-}
-Item.prototype.run = function () {
-  this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = '';
-// empty string to avoid regexp issues
-process.versions = {};
-function noop() {}
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-process.listeners = function (name) {
-  return [];
-};
-process.binding = function (name) {
-  throw new Error('process.binding is not supported');
-};
-process.cwd = function () {
-  return '/';
-};
-process.chdir = function (dir) {
-  throw new Error('process.chdir is not supported');
-};
-process.umask = function () {
-  return 0;
-};
-
-},{}],"5yMqL":[function(require,module,exports) {
-'use strict';
-
-var utils = require('../utils');
-
-module.exports = function normalizeHeaderName(headers, normalizedName) {
-  utils.forEach(headers, function processHeader(value, name) {
-    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
-      headers[normalizedName] = value;
-      delete headers[name];
-    }
-  });
-};
-
-},{"../utils":"7J9rV"}],"6pJqL":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-var settle = require('./../core/settle');
-var cookies = require('./../helpers/cookies');
-var buildURL = require('./../helpers/buildURL');
-var buildFullPath = require('../core/buildFullPath');
-var parseHeaders = require('./../helpers/parseHeaders');
-var isURLSameOrigin = require('./../helpers/isURLSameOrigin');
-var createError = require('../core/createError');
-
-module.exports = function xhrAdapter(config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    var requestData = config.data;
-    var requestHeaders = config.headers;
-
-    if (utils.isFormData(requestData)) {
-      delete requestHeaders['Content-Type']; // Let the browser set it
-    }
-
-    var request = new XMLHttpRequest();
-
-    // HTTP basic authentication
-    if (config.auth) {
-      var username = config.auth.username || '';
-      var password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : '';
-      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-    }
-
-    var fullPath = buildFullPath(config.baseURL, config.url);
-    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
-
-    // Set the request timeout in MS
-    request.timeout = config.timeout;
-
-    // Listen for ready state
-    request.onreadystatechange = function handleLoad() {
-      if (!request || request.readyState !== 4) {
-        return;
-      }
-
-      // The request errored out and we didn't get a response, this will be
-      // handled by onerror instead
-      // With one exception: request that using file: protocol, most browsers
-      // will return status as 0 even though it's a successful request
-      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-        return;
-      }
-
-      // Prepare the response
-      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
-      var response = {
-        data: responseData,
-        status: request.status,
-        statusText: request.statusText,
-        headers: responseHeaders,
-        config: config,
-        request: request
-      };
-
-      settle(resolve, reject, response);
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle browser request cancellation (as opposed to a manual cancellation)
-    request.onabort = function handleAbort() {
-      if (!request) {
-        return;
-      }
-
-      reject(createError('Request aborted', config, 'ECONNABORTED', request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(createError('Network Error', config, null, request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      var timeoutErrorMessage = 'timeout of ' + config.timeout + 'ms exceeded';
-      if (config.timeoutErrorMessage) {
-        timeoutErrorMessage = config.timeoutErrorMessage;
-      }
-      reject(createError(timeoutErrorMessage, config, 'ECONNABORTED',
-        request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Add xsrf header
-    // This is only done if running in a standard browser environment.
-    // Specifically not if we're in a web worker, or react-native.
-    if (utils.isStandardBrowserEnv()) {
-      // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
-        cookies.read(config.xsrfCookieName) :
-        undefined;
-
-      if (xsrfValue) {
-        requestHeaders[config.xsrfHeaderName] = xsrfValue;
-      }
-    }
-
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-          // Remove Content-Type if data is undefined
-          delete requestHeaders[key];
-        } else {
-          // Otherwise add header to the request
-          request.setRequestHeader(key, val);
-        }
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (!utils.isUndefined(config.withCredentials)) {
-      request.withCredentials = !!config.withCredentials;
-    }
-
-    // Add responseType to request if needed
-    if (config.responseType) {
-      try {
-        request.responseType = config.responseType;
-      } catch (e) {
-        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
-        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
-        if (config.responseType !== 'json') {
-          throw e;
-        }
-      }
-    }
-
-    // Handle progress if needed
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', config.onDownloadProgress);
-    }
-
-    // Not all browsers support upload events
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', config.onUploadProgress);
-    }
-
-    if (config.cancelToken) {
-      // Handle cancellation
-      config.cancelToken.promise.then(function onCanceled(cancel) {
-        if (!request) {
-          return;
-        }
-
-        request.abort();
-        reject(cancel);
-        // Clean up request
-        request = null;
-      });
-    }
-
-    if (!requestData) {
-      requestData = null;
-    }
-
-    // Send the request
-    request.send(requestData);
-  });
-};
-
-},{"./../utils":"7J9rV","./../core/settle":"72M6J","./../helpers/cookies":"1m0F1","./../helpers/buildURL":"25KfR","../core/buildFullPath":"5fWja","./../helpers/parseHeaders":"1KizL","./../helpers/isURLSameOrigin":"6Gtz3","../core/createError":"7ETv1"}],"72M6J":[function(require,module,exports) {
-'use strict';
-
-var createError = require('./createError');
-
-/**
- * Resolve or reject a Promise based on response status.
- *
- * @param {Function} resolve A function that resolves the promise.
- * @param {Function} reject A function that rejects the promise.
- * @param {object} response The response.
- */
-module.exports = function settle(resolve, reject, response) {
-  var validateStatus = response.config.validateStatus;
-  if (!response.status || !validateStatus || validateStatus(response.status)) {
-    resolve(response);
-  } else {
-    reject(createError(
-      'Request failed with status code ' + response.status,
-      response.config,
-      null,
-      response.request,
-      response
-    ));
-  }
-};
-
-},{"./createError":"7ETv1"}],"7ETv1":[function(require,module,exports) {
-'use strict';
-
-var enhanceError = require('./enhanceError');
-
-/**
- * Create an Error with the specified message, config, error code, request and response.
- *
- * @param {string} message The error message.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The created error.
- */
-module.exports = function createError(message, config, code, request, response) {
-  var error = new Error(message);
-  return enhanceError(error, config, code, request, response);
-};
-
-},{"./enhanceError":"2O2Ud"}],"2O2Ud":[function(require,module,exports) {
-'use strict';
-
-/**
- * Update an Error with the specified config, error code, and response.
- *
- * @param {Error} error The error to update.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The error.
- */
-module.exports = function enhanceError(error, config, code, request, response) {
-  error.config = config;
-  if (code) {
-    error.code = code;
-  }
-
-  error.request = request;
-  error.response = response;
-  error.isAxiosError = true;
-
-  error.toJSON = function toJSON() {
-    return {
-      // Standard
-      message: this.message,
-      name: this.name,
-      // Microsoft
-      description: this.description,
-      number: this.number,
-      // Mozilla
-      fileName: this.fileName,
-      lineNumber: this.lineNumber,
-      columnNumber: this.columnNumber,
-      stack: this.stack,
-      // Axios
-      config: this.config,
-      code: this.code
-    };
-  };
-  return error;
-};
-
-},{}],"1m0F1":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs support document.cookie
-    (function standardBrowserEnv() {
-      return {
-        write: function write(name, value, expires, path, domain, secure) {
-          var cookie = [];
-          cookie.push(name + '=' + encodeURIComponent(value));
-
-          if (utils.isNumber(expires)) {
-            cookie.push('expires=' + new Date(expires).toGMTString());
-          }
-
-          if (utils.isString(path)) {
-            cookie.push('path=' + path);
-          }
-
-          if (utils.isString(domain)) {
-            cookie.push('domain=' + domain);
-          }
-
-          if (secure === true) {
-            cookie.push('secure');
-          }
-
-          document.cookie = cookie.join('; ');
-        },
-
-        read: function read(name) {
-          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-          return (match ? decodeURIComponent(match[3]) : null);
-        },
-
-        remove: function remove(name) {
-          this.write(name, '', Date.now() - 86400000);
-        }
-      };
-    })() :
-
-  // Non standard browser env (web workers, react-native) lack needed support.
-    (function nonStandardBrowserEnv() {
-      return {
-        write: function write() {},
-        read: function read() { return null; },
-        remove: function remove() {}
-      };
-    })()
-);
-
-},{"./../utils":"7J9rV"}],"5fWja":[function(require,module,exports) {
-'use strict';
-
-var isAbsoluteURL = require('../helpers/isAbsoluteURL');
-var combineURLs = require('../helpers/combineURLs');
-
-/**
- * Creates a new URL by combining the baseURL with the requestedURL,
- * only when the requestedURL is not already an absolute URL.
- * If the requestURL is absolute, this function returns the requestedURL untouched.
- *
- * @param {string} baseURL The base URL
- * @param {string} requestedURL Absolute or relative URL to combine
- * @returns {string} The combined full path
- */
-module.exports = function buildFullPath(baseURL, requestedURL) {
-  if (baseURL && !isAbsoluteURL(requestedURL)) {
-    return combineURLs(baseURL, requestedURL);
-  }
-  return requestedURL;
-};
-
-},{"../helpers/isAbsoluteURL":"4FcN1","../helpers/combineURLs":"qMap4"}],"4FcN1":[function(require,module,exports) {
-'use strict';
-
-/**
- * Determines whether the specified URL is absolute
- *
- * @param {string} url The URL to test
- * @returns {boolean} True if the specified URL is absolute, otherwise false
- */
-module.exports = function isAbsoluteURL(url) {
-  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-  // by any combination of letters, digits, plus, period, or hyphen.
-  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
-};
-
-},{}],"qMap4":[function(require,module,exports) {
-'use strict';
-
-/**
- * Creates a new URL by combining the specified URLs
- *
- * @param {string} baseURL The base URL
- * @param {string} relativeURL The relative URL
- * @returns {string} The combined URL
- */
-module.exports = function combineURLs(baseURL, relativeURL) {
-  return relativeURL
-    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
-    : baseURL;
-};
-
-},{}],"1KizL":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-// Headers whose duplicates are ignored by node
-// c.f. https://nodejs.org/api/http.html#http_message_headers
-var ignoreDuplicateOf = [
-  'age', 'authorization', 'content-length', 'content-type', 'etag',
-  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
-  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
-  'referer', 'retry-after', 'user-agent'
-];
-
-/**
- * Parse headers into an object
- *
- * ```
- * Date: Wed, 27 Aug 2014 08:58:49 GMT
- * Content-Type: application/json
- * Connection: keep-alive
- * Transfer-Encoding: chunked
- * ```
- *
- * @param {String} headers Headers needing to be parsed
- * @returns {Object} Headers parsed into an object
- */
-module.exports = function parseHeaders(headers) {
-  var parsed = {};
-  var key;
-  var val;
-  var i;
-
-  if (!headers) { return parsed; }
-
-  utils.forEach(headers.split('\n'), function parser(line) {
-    i = line.indexOf(':');
-    key = utils.trim(line.substr(0, i)).toLowerCase();
-    val = utils.trim(line.substr(i + 1));
-
-    if (key) {
-      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
-        return;
-      }
-      if (key === 'set-cookie') {
-        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
-      } else {
-        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-      }
-    }
-  });
-
-  return parsed;
-};
-
-},{"./../utils":"7J9rV"}],"6Gtz3":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs have full support of the APIs needed to test
-  // whether the request URL is of the same origin as current location.
-    (function standardBrowserEnv() {
-      var msie = /(msie|trident)/i.test(navigator.userAgent);
-      var urlParsingNode = document.createElement('a');
-      var originURL;
-
-      /**
-    * Parse a URL to discover it's components
-    *
-    * @param {String} url The URL to be parsed
-    * @returns {Object}
-    */
-      function resolveURL(url) {
-        var href = url;
-
-        if (msie) {
-        // IE needs attribute set twice to normalize properties
-          urlParsingNode.setAttribute('href', href);
-          href = urlParsingNode.href;
-        }
-
-        urlParsingNode.setAttribute('href', href);
-
-        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-        return {
-          href: urlParsingNode.href,
-          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-          host: urlParsingNode.host,
-          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-          hostname: urlParsingNode.hostname,
-          port: urlParsingNode.port,
-          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-            urlParsingNode.pathname :
-            '/' + urlParsingNode.pathname
-        };
-      }
-
-      originURL = resolveURL(window.location.href);
-
-      /**
-    * Determine if a URL shares the same origin as the current location
-    *
-    * @param {String} requestURL The URL to test
-    * @returns {boolean} True if URL shares the same origin, otherwise false
-    */
-      return function isURLSameOrigin(requestURL) {
-        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-        return (parsed.protocol === originURL.protocol &&
-            parsed.host === originURL.host);
-      };
-    })() :
-
-  // Non standard browser envs (web workers, react-native) lack needed support.
-    (function nonStandardBrowserEnv() {
-      return function isURLSameOrigin() {
-        return true;
-      };
-    })()
-);
-
-},{"./../utils":"7J9rV"}],"42z1a":[function(require,module,exports) {
-'use strict';
-
-var utils = require('../utils');
-
-/**
- * Config-specific merge-function which creates a new config-object
- * by merging two configuration objects together.
- *
- * @param {Object} config1
- * @param {Object} config2
- * @returns {Object} New object resulting from merging config2 to config1
- */
-module.exports = function mergeConfig(config1, config2) {
-  // eslint-disable-next-line no-param-reassign
-  config2 = config2 || {};
-  var config = {};
-
-  var valueFromConfig2Keys = ['url', 'method', 'data'];
-  var mergeDeepPropertiesKeys = ['headers', 'auth', 'proxy', 'params'];
-  var defaultToConfig2Keys = [
-    'baseURL', 'transformRequest', 'transformResponse', 'paramsSerializer',
-    'timeout', 'timeoutMessage', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
-    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress', 'decompress',
-    'maxContentLength', 'maxBodyLength', 'maxRedirects', 'transport', 'httpAgent',
-    'httpsAgent', 'cancelToken', 'socketPath', 'responseEncoding'
-  ];
-  var directMergeKeys = ['validateStatus'];
-
-  function getMergedValue(target, source) {
-    if (utils.isPlainObject(target) && utils.isPlainObject(source)) {
-      return utils.merge(target, source);
-    } else if (utils.isPlainObject(source)) {
-      return utils.merge({}, source);
-    } else if (utils.isArray(source)) {
-      return source.slice();
-    }
-    return source;
-  }
-
-  function mergeDeepProperties(prop) {
-    if (!utils.isUndefined(config2[prop])) {
-      config[prop] = getMergedValue(config1[prop], config2[prop]);
-    } else if (!utils.isUndefined(config1[prop])) {
-      config[prop] = getMergedValue(undefined, config1[prop]);
-    }
-  }
-
-  utils.forEach(valueFromConfig2Keys, function valueFromConfig2(prop) {
-    if (!utils.isUndefined(config2[prop])) {
-      config[prop] = getMergedValue(undefined, config2[prop]);
-    }
-  });
-
-  utils.forEach(mergeDeepPropertiesKeys, mergeDeepProperties);
-
-  utils.forEach(defaultToConfig2Keys, function defaultToConfig2(prop) {
-    if (!utils.isUndefined(config2[prop])) {
-      config[prop] = getMergedValue(undefined, config2[prop]);
-    } else if (!utils.isUndefined(config1[prop])) {
-      config[prop] = getMergedValue(undefined, config1[prop]);
-    }
-  });
-
-  utils.forEach(directMergeKeys, function merge(prop) {
-    if (prop in config2) {
-      config[prop] = getMergedValue(config1[prop], config2[prop]);
-    } else if (prop in config1) {
-      config[prop] = getMergedValue(undefined, config1[prop]);
-    }
-  });
-
-  var axiosKeys = valueFromConfig2Keys
-    .concat(mergeDeepPropertiesKeys)
-    .concat(defaultToConfig2Keys)
-    .concat(directMergeKeys);
-
-  var otherKeys = Object
-    .keys(config1)
-    .concat(Object.keys(config2))
-    .filter(function filterAxiosKeys(key) {
-      return axiosKeys.indexOf(key) === -1;
-    });
-
-  utils.forEach(otherKeys, mergeDeepProperties);
-
-  return config;
-};
-
-},{"../utils":"7J9rV"}],"1Ql7i":[function(require,module,exports) {
-'use strict';
-
-/**
- * A `Cancel` is an object that is thrown when an operation is canceled.
- *
- * @class
- * @param {string=} message The message.
- */
-function Cancel(message) {
-  this.message = message;
-}
-
-Cancel.prototype.toString = function toString() {
-  return 'Cancel' + (this.message ? ': ' + this.message : '');
-};
-
-Cancel.prototype.__CANCEL__ = true;
-
-module.exports = Cancel;
-
-},{}],"hHamf":[function(require,module,exports) {
-'use strict';
-
-var Cancel = require('./Cancel');
-
-/**
- * A `CancelToken` is an object that can be used to request cancellation of an operation.
- *
- * @class
- * @param {Function} executor The executor function.
- */
-function CancelToken(executor) {
-  if (typeof executor !== 'function') {
-    throw new TypeError('executor must be a function.');
-  }
-
-  var resolvePromise;
-  this.promise = new Promise(function promiseExecutor(resolve) {
-    resolvePromise = resolve;
-  });
-
-  var token = this;
-  executor(function cancel(message) {
-    if (token.reason) {
-      // Cancellation has already been requested
-      return;
-    }
-
-    token.reason = new Cancel(message);
-    resolvePromise(token.reason);
-  });
-}
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-CancelToken.prototype.throwIfRequested = function throwIfRequested() {
-  if (this.reason) {
-    throw this.reason;
-  }
-};
-
-/**
- * Returns an object that contains a new `CancelToken` and a function that, when called,
- * cancels the `CancelToken`.
- */
-CancelToken.source = function source() {
-  var cancel;
-  var token = new CancelToken(function executor(c) {
-    cancel = c;
-  });
-  return {
-    token: token,
-    cancel: cancel
-  };
-};
-
-module.exports = CancelToken;
-
-},{"./Cancel":"1Ql7i"}],"9FoXt":[function(require,module,exports) {
-'use strict';
-
-/**
- * Syntactic sugar for invoking a function and expanding an array for arguments.
- *
- * Common use case would be to use `Function.prototype.apply`.
- *
- *  ```js
- *  function f(x, y, z) {}
- *  var args = [1, 2, 3];
- *  f.apply(null, args);
- *  ```
- *
- * With `spread` this example can be re-written.
- *
- *  ```js
- *  spread(function(x, y, z) {})([1, 2, 3]);
- *  ```
- *
- * @param {Function} callback
- * @returns {Function}
- */
-module.exports = function spread(callback) {
-  return function wrap(arr) {
-    return callback.apply(null, arr);
-  };
-};
-
-},{}],"1bzv8":[function(require,module,exports) {
-'use strict';
-
-/**
- * Determines whether the payload is an error thrown by Axios
- *
- * @param {*} payload The value to test
- * @returns {boolean} True if the payload is an error thrown by Axios, otherwise false
- */
-module.exports = function isAxiosError(payload) {
-  return (typeof payload === 'object') && (payload.isAxiosError === true);
-};
-
-},{}],"AWzhP":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-const apiUrl = 'https://moviesapi-node.herokuapp.com';
-exports.default = apiUrl;
-
-},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"2QXPk":[function(require,module,exports) {
+},{"react-dom":"2sg1U"}],"2QXPk":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "SET_MOVIES", function () {
@@ -56176,7 +54979,7 @@ function setFilter(payload) {
   };
 }
 
-},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"Tqoul":[function(require,module,exports) {
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"6M7fu":[function(require,module,exports) {
 var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -56187,239 +54990,8 @@ try {
   var _react = require('react');
   var _reactDefault = _parcelHelpers.interopDefault(_react);
   var _reactRedux = require('react-redux');
-  var _reactBootstrap = require('react-bootstrap');
-  var _reactRouterDom = require('react-router-dom');
-  var _hooksUseLogOut = require('../../hooks/useLogOut');
-  var _hooksUseLogOutDefault = _parcelHelpers.interopDefault(_hooksUseLogOut);
-  var _visibilityFilterInputVisibilityFilterInput = require('../visibility-filter-input/visibility-filter-input');
-  var _visibilityFilterInputVisibilityFilterInputDefault = _parcelHelpers.interopDefault(_visibilityFilterInputVisibilityFilterInput);
-  require('./navigation.scss');
-  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/navigation/navigation.jsx", _s = $RefreshSig$();
-  function Navigation() {
-    _s();
-    const onLoggedOut = _hooksUseLogOutDefault.default();
-    const user = _reactRedux.useSelector(state => state.user);
-    return (
-      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 14,
-          columnNumber: 5
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 15,
-          columnNumber: 7
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Navbar, {
-        className: "navigation",
-        collapseOnSelect: true,
-        expand: "lg",
-        bg: "secondary",
-        variant: "primary",
-        sticky: "top",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 16,
-          columnNumber: 9
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Navbar.Brand, {
-        as: _reactRouterDom.Link,
-        to: "/",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 17,
-          columnNumber: 11
-        }
-      }, "MYFLIX APP"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Navbar.Toggle, {
-        "aria-controls": "responsive-navbar-nav",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 18,
-          columnNumber: 11
-        }
-      }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Navbar.Collapse, {
-        id: "responsive-navbar-nav",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 19,
-          columnNumber: 11
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Nav, {
-        className: "mr-auto",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 20,
-          columnNumber: 13
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Nav.Link, {
-        as: _reactRouterDom.Link,
-        to: "/",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 21,
-          columnNumber: 15
-        }
-      }, "Home"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Nav.Link, {
-        as: _reactRouterDom.Link,
-        to: "/myfavorites",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 22,
-          columnNumber: 15
-        }
-      }, "Favorites")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Nav, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 24,
-          columnNumber: 13
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_visibilityFilterInputVisibilityFilterInputDefault.default, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 25,
-          columnNumber: 15
-        }
-      }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.NavDropdown, {
-        title: `${user}'s Profile`,
-        id: "basic-nav-dropdown",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 26,
-          columnNumber: 15
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.NavDropdown.Item, {
-        as: _reactRouterDom.Link,
-        to: `/profile`,
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 27,
-          columnNumber: 15
-        }
-      }, "My Profile"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.NavDropdown.Divider, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 28,
-          columnNumber: 15
-        }
-      }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.NavDropdown.Item, {
-        onClick: onLoggedOut,
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 29,
-          columnNumber: 15
-        }
-      }, "Log Out")))))))
-    );
-  }
-  _s(Navigation, "79eAQQGCO3NWxN7oUjUQuRnvboc=", false, function () {
-    return [_hooksUseLogOutDefault.default, _reactRedux.useSelector];
-  });
-  _c = Navigation;
-  exports.default = Navigation;
-  var _c;
-  $RefreshReg$(_c, "Navigation");
-  helpers.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-
-},{"react":"3b2NM","react-bootstrap":"4n7hB","./navigation.scss":"4lNlM","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","react-router-dom":"1PMSK","../visibility-filter-input/visibility-filter-input":"3SRLP","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","react-redux":"7GDa4","../../hooks/useLogOut":"5qTIe"}],"4lNlM":[function() {},{}],"3SRLP":[function(require,module,exports) {
-var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-helpers.prelude(module);
-try {
-  var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-  _parcelHelpers.defineInteropFlag(exports);
-  var _react = require('react');
-  var _reactDefault = _parcelHelpers.interopDefault(_react);
-  var _reactRedux = require('react-redux');
-  var _reduxActionsActions = require('../../redux/actions/actions');
-  var _reactBootstrapForm = require('react-bootstrap/Form');
-  var _reactBootstrapFormDefault = _parcelHelpers.interopDefault(_reactBootstrapForm);
-  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/visibility-filter-input/visibility-filter-input.jsx", _s = $RefreshSig$();
-  function VisibilityFilterInput(props) {
-    _s();
-    const dispatch = _reactRedux.useDispatch();
-    const visibilityFilter = _reactRedux.useSelector(state => state.visibilityFilter);
-    return (
-      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapFormDefault.default.Control, {
-        onChange: e => dispatch(_reduxActionsActions.setFilter(e.target.value)),
-        value: visibilityFilter,
-        placeholder: "Search",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 10,
-          columnNumber: 10
-        }
-      })
-    );
-  }
-  _s(VisibilityFilterInput, "uGspsobeGD5Ye1cSkfHTIf9LaIs=", false, function () {
-    return [_reactRedux.useDispatch, _reactRedux.useSelector];
-  });
-  _c = VisibilityFilterInput;
-  exports.default = VisibilityFilterInput;
-  var _c;
-  $RefreshReg$(_c, "VisibilityFilterInput");
-  helpers.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-
-},{"react":"3b2NM","react-redux":"7GDa4","../../redux/actions/actions":"2QXPk","react-bootstrap/Form":"6A5ko","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f"}],"5qTIe":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-var _reactRedux = require('react-redux');
-var _reduxActionsActions = require('../redux/actions/actions');
-var _s = $RefreshSig$();
-const useLogOut = () => {
-  _s();
-  const dispatch = _reactRedux.useDispatch();
-  const onLoggedOut = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    dispatch(_reduxActionsActions.setUser(null));
-    dispatch(_reduxActionsActions.setMessage("You have logged out successfully  "));
-  };
-  return onLoggedOut;
-};
-_s(useLogOut, "rgTLoBID190wEKCp9+G8W6F7A5M=", false, function () {
-  return [_reactRedux.useDispatch];
-});
-exports.default = useLogOut;
-
-},{"react-redux":"7GDa4","../redux/actions/actions":"2QXPk","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"6M7fu":[function(require,module,exports) {
-var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-helpers.prelude(module);
-try {
-  var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-  _parcelHelpers.defineInteropFlag(exports);
-  var _react = require('react');
-  var _reactDefault = _parcelHelpers.interopDefault(_react);
-  var _reactRedux = require('react-redux');
+  var _propTypes = require('prop-types');
+  var _propTypesDefault = _parcelHelpers.interopDefault(_propTypes);
   var _reactBootstrap = require('react-bootstrap');
   var _reactBootstrapIcons = require('react-bootstrap-icons');
   var _reactRouterDom = require('react-router-dom');
@@ -56427,18 +54999,13 @@ try {
   var _reduxActionsActions = require('../../redux/actions/actions');
   var _hooksUseRequest = require('../../hooks/useRequest');
   var _hooksUseRequestDefault = _parcelHelpers.interopDefault(_hooksUseRequest);
-  var _hooksUseUserDetails = require('../../hooks/useUserDetails');
-  var _hooksUseUserDetailsDefault = _parcelHelpers.interopDefault(_hooksUseUserDetails);
-  var _hooksUseMovies = require('../../hooks/useMovies');
-  var _hooksUseMoviesDefault = _parcelHelpers.interopDefault(_hooksUseMovies);
   require('./login-view.scss');
   var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/login-view/login-view.jsx", _s = $RefreshSig$();
   function LoginView(props) {
     _s();
     const dispatch = _reactRedux.useDispatch();
+    const {onLoggedIn} = props;
     const apiRequest = _hooksUseRequestDefault.default();
-    const getUserDetails = _hooksUseUserDetailsDefault.default();
-    const getMovies = _hooksUseMoviesDefault.default();
     const [loading, setLoading] = _react.useState(false);
     const validate = values => {
       const errors = {};
@@ -56451,15 +55018,6 @@ try {
         errors.password = "Password should be longer than 6 characters";
       }
       return errors;
-    };
-    /*When a user successfully logs in, this function updates the `user` property in state to that *particular user*/
-    const onLoggedIn = authData => {
-      dispatch(_reduxActionsActions.setUser(authData.data.Username));
-      localStorage.setItem('token', authData.token);
-      localStorage.setItem('user', authData.data.Username);
-      getMovies();
-      getUserDetails(authData.data.Username, authData.token);
-      dispatch(_reduxActionsActions.setMessage("You have logged in successfully"));
     };
     const handleSubmit = async values => {
       setLoading(true);
@@ -56477,26 +55035,12 @@ try {
     };
     return (
       /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 57,
-          columnNumber: 5
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 59,
-          columnNumber: 7
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         className: "login-view",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 60,
-          columnNumber: 9
+          lineNumber: 45,
+          columnNumber: 5
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "d-flex justify-content-center align-items-center",
@@ -56504,15 +55048,15 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 61,
-          columnNumber: 11
+          lineNumber: 46,
+          columnNumber: 7
         }
       }, /*#__PURE__*/_reactDefault.default.createElement("h1", {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 62,
-          columnNumber: 13
+          lineNumber: 47,
+          columnNumber: 9
         }
       }, "MyFlix")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "d-flex justify-content-center",
@@ -56520,31 +55064,31 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 64,
-          columnNumber: 11
+          lineNumber: 49,
+          columnNumber: 7
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card, {
         className: "login-card",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 65,
-          columnNumber: 13
+          lineNumber: 50,
+          columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Header, {
         className: "login-card__header",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 66,
-          columnNumber: 15
+          lineNumber: 51,
+          columnNumber: 11
         }
       }, "Sign In"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Body, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 69,
-          columnNumber: 15
+          lineNumber: 54,
+          columnNumber: 11
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_formik.Formik, {
         validate: validate,
@@ -56556,45 +55100,45 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 70,
-          columnNumber: 17
+          lineNumber: 55,
+          columnNumber: 13
         }
       }, ({handleSubmit, handleChange, handleBlur, touched, values, errors}) => /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 86,
-          columnNumber: 19
+          lineNumber: 71,
+          columnNumber: 15
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formUsername",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 87,
-          columnNumber: 21
+          lineNumber: 72,
+          columnNumber: 17
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 88,
-          columnNumber: 23
+          lineNumber: 73,
+          columnNumber: 19
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "login-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 89,
-          columnNumber: 25
+          lineNumber: 74,
+          columnNumber: 21
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapIcons.PersonFill, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 90,
-          columnNumber: 27
+          lineNumber: 75,
+          columnNumber: 23
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         name: "username",
@@ -56608,47 +55152,47 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 92,
-          columnNumber: 25
+          lineNumber: 77,
+          columnNumber: 21
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 101,
-          columnNumber: 25
+          lineNumber: 86,
+          columnNumber: 21
         }
       }, errors.username))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formPassword",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 107,
-          columnNumber: 21
+          lineNumber: 92,
+          columnNumber: 17
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         className: "mb-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 108,
-          columnNumber: 23
+          lineNumber: 93,
+          columnNumber: 19
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "login-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 109,
-          columnNumber: 25
+          lineNumber: 94,
+          columnNumber: 21
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapIcons.KeyFill, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 110,
-          columnNumber: 27
+          lineNumber: 95,
+          columnNumber: 23
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         name: "password",
@@ -56662,16 +55206,16 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 112,
-          columnNumber: 25
+          lineNumber: 97,
+          columnNumber: 21
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 121,
-          columnNumber: 25
+          lineNumber: 106,
+          columnNumber: 21
         }
       }, errors.password))), loading ? /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Spinner, {
         className: "float-right",
@@ -56680,8 +55224,8 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 127,
-          columnNumber: 21
+          lineNumber: 112,
+          columnNumber: 17
         }
       }) : /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
         className: "float-right",
@@ -56691,31 +55235,34 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 129,
-          columnNumber: 21
+          lineNumber: 114,
+          columnNumber: 17
         }
       }, "LogIn")))), !loading && /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Footer, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 136,
-          columnNumber: 28
+          lineNumber: 121,
+          columnNumber: 24
         }
       }, "Don't you have an account? ", /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Link, {
         to: "/register",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 136,
-          columnNumber: 68
+          lineNumber: 121,
+          columnNumber: 64
         }
-      }, "Sign Up")))))))
+      }, "Sign Up")))))
     );
   }
-  _s(LoginView, "+jK+n/aAMXxrQ7wq1XXq7XjFvz4=", false, function () {
-    return [_reactRedux.useDispatch, _hooksUseRequestDefault.default, _hooksUseUserDetailsDefault.default, _hooksUseMoviesDefault.default];
+  _s(LoginView, "mhuk48VnaBKB7dR+2rRDc6d0NmY=", false, function () {
+    return [_reactRedux.useDispatch, _hooksUseRequestDefault.default];
   });
   _c = LoginView;
+  LoginView.propTypes = {
+    onLoggedIn: _propTypesDefault.default.func.isRequired
+  };
   exports.default = LoginView;
   var _c;
   $RefreshReg$(_c, "LoginView");
@@ -56725,7 +55272,7 @@ try {
   window.$RefreshSig$ = prevRefreshSig;
 }
 
-},{"react":"3b2NM","react-bootstrap":"4n7hB","react-bootstrap-icons":"3E1Qi","./login-view.scss":"3ueKO","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../hooks/useRequest":"2iXqm","react-router-dom":"1PMSK","formik":"67atH","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","react-redux":"7GDa4","../../redux/actions/actions":"2QXPk","../../hooks/useUserDetails":"1NB9z","../../hooks/useMovies":"7L5z8"}],"3E1Qi":[function(require,module,exports) {
+},{"react":"3b2NM","prop-types":"4dfy5","react-bootstrap":"4n7hB","react-bootstrap-icons":"3E1Qi","./login-view.scss":"3ueKO","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../hooks/useRequest":"2iXqm","react-router-dom":"1PMSK","formik":"67atH","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","react-redux":"7GDa4","../../redux/actions/actions":"2QXPk"}],"3E1Qi":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -92626,7 +91173,1786 @@ exports.Youtube = Youtube;
 exports.ZoomIn = ZoomIn;
 exports.ZoomOut = ZoomOut;
 
-},{"react":"3b2NM","prop-types":"4dfy5"}],"3ueKO":[function() {},{}],"67atH":[function(require,module,exports) {
+},{"react":"3b2NM","prop-types":"4dfy5"}],"3ueKO":[function() {},{}],"2iXqm":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+var _axios = require('axios');
+var _axiosDefault = _parcelHelpers.interopDefault(_axios);
+var _utilsApi = require('../utils/api');
+var _utilsApiDefault = _parcelHelpers.interopDefault(_utilsApi);
+function useRequest() {
+  const apiRequest = async (method, path, data = null, token) => {
+    const accessToken = token ? token : localStorage.getItem('token');
+    try {
+      const response = await _axiosDefault.default({
+        method,
+        url: `${_utilsApiDefault.default}${path}`,
+        data,
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response ? error.response.data.message : "Ops! Something happened";
+    }
+  };
+  return apiRequest;
+}
+exports.default = useRequest;
+
+},{"axios":"7rA65","../utils/api":"AWzhP","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"7rA65":[function(require,module,exports) {
+module.exports = require('./lib/axios');
+},{"./lib/axios":"4qfhW"}],"4qfhW":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./utils');
+var bind = require('./helpers/bind');
+var Axios = require('./core/Axios');
+var mergeConfig = require('./core/mergeConfig');
+var defaults = require('./defaults');
+
+/**
+ * Create an instance of Axios
+ *
+ * @param {Object} defaultConfig The default config for the instance
+ * @return {Axios} A new instance of Axios
+ */
+function createInstance(defaultConfig) {
+  var context = new Axios(defaultConfig);
+  var instance = bind(Axios.prototype.request, context);
+
+  // Copy axios.prototype to instance
+  utils.extend(instance, Axios.prototype, context);
+
+  // Copy context to instance
+  utils.extend(instance, context);
+
+  return instance;
+}
+
+// Create the default instance to be exported
+var axios = createInstance(defaults);
+
+// Expose Axios class to allow class inheritance
+axios.Axios = Axios;
+
+// Factory for creating new instances
+axios.create = function create(instanceConfig) {
+  return createInstance(mergeConfig(axios.defaults, instanceConfig));
+};
+
+// Expose Cancel & CancelToken
+axios.Cancel = require('./cancel/Cancel');
+axios.CancelToken = require('./cancel/CancelToken');
+axios.isCancel = require('./cancel/isCancel');
+
+// Expose all/spread
+axios.all = function all(promises) {
+  return Promise.all(promises);
+};
+axios.spread = require('./helpers/spread');
+
+// Expose isAxiosError
+axios.isAxiosError = require('./helpers/isAxiosError');
+
+module.exports = axios;
+
+// Allow use of default import syntax in TypeScript
+module.exports.default = axios;
+
+},{"./utils":"7J9rV","./helpers/bind":"78Fwk","./core/Axios":"26bz2","./core/mergeConfig":"42z1a","./defaults":"5j10E","./cancel/Cancel":"1Ql7i","./cancel/CancelToken":"hHamf","./cancel/isCancel":"3MAgn","./helpers/spread":"9FoXt","./helpers/isAxiosError":"1bzv8"}],"7J9rV":[function(require,module,exports) {
+'use strict';
+
+var bind = require('./helpers/bind');
+
+/*global toString:true*/
+
+// utils is a library of generic helper functions non-specific to axios
+
+var toString = Object.prototype.toString;
+
+/**
+ * Determine if a value is an Array
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Array, otherwise false
+ */
+function isArray(val) {
+  return toString.call(val) === '[object Array]';
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is a Buffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Buffer, otherwise false
+ */
+function isBuffer(val) {
+  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
+    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
+}
+
+/**
+ * Determine if a value is an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+function isArrayBuffer(val) {
+  return toString.call(val) === '[object ArrayBuffer]';
+}
+
+/**
+ * Determine if a value is a FormData
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an FormData, otherwise false
+ */
+function isFormData(val) {
+  return (typeof FormData !== 'undefined') && (val instanceof FormData);
+}
+
+/**
+ * Determine if a value is a view on an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+ */
+function isArrayBufferView(val) {
+  var result;
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    result = ArrayBuffer.isView(val);
+  } else {
+    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+  }
+  return result;
+}
+
+/**
+ * Determine if a value is a String
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a String, otherwise false
+ */
+function isString(val) {
+  return typeof val === 'string';
+}
+
+/**
+ * Determine if a value is a Number
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Number, otherwise false
+ */
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+/**
+ * Determine if a value is an Object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Object, otherwise false
+ */
+function isObject(val) {
+  return val !== null && typeof val === 'object';
+}
+
+/**
+ * Determine if a value is a plain Object
+ *
+ * @param {Object} val The value to test
+ * @return {boolean} True if value is a plain Object, otherwise false
+ */
+function isPlainObject(val) {
+  if (toString.call(val) !== '[object Object]') {
+    return false;
+  }
+
+  var prototype = Object.getPrototypeOf(val);
+  return prototype === null || prototype === Object.prototype;
+}
+
+/**
+ * Determine if a value is a Date
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Date, otherwise false
+ */
+function isDate(val) {
+  return toString.call(val) === '[object Date]';
+}
+
+/**
+ * Determine if a value is a File
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a File, otherwise false
+ */
+function isFile(val) {
+  return toString.call(val) === '[object File]';
+}
+
+/**
+ * Determine if a value is a Blob
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Blob, otherwise false
+ */
+function isBlob(val) {
+  return toString.call(val) === '[object Blob]';
+}
+
+/**
+ * Determine if a value is a Function
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Function, otherwise false
+ */
+function isFunction(val) {
+  return toString.call(val) === '[object Function]';
+}
+
+/**
+ * Determine if a value is a Stream
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Stream, otherwise false
+ */
+function isStream(val) {
+  return isObject(val) && isFunction(val.pipe);
+}
+
+/**
+ * Determine if a value is a URLSearchParams object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+ */
+function isURLSearchParams(val) {
+  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
+}
+
+/**
+ * Trim excess whitespace off the beginning and end of a string
+ *
+ * @param {String} str The String to trim
+ * @returns {String} The String freed of excess whitespace
+ */
+function trim(str) {
+  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+}
+
+/**
+ * Determine if we're running in a standard browser environment
+ *
+ * This allows axios to run in a web worker, and react-native.
+ * Both environments support XMLHttpRequest, but not fully standard globals.
+ *
+ * web workers:
+ *  typeof window -> undefined
+ *  typeof document -> undefined
+ *
+ * react-native:
+ *  navigator.product -> 'ReactNative'
+ * nativescript
+ *  navigator.product -> 'NativeScript' or 'NS'
+ */
+function isStandardBrowserEnv() {
+  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
+                                           navigator.product === 'NativeScript' ||
+                                           navigator.product === 'NS')) {
+    return false;
+  }
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined'
+  );
+}
+
+/**
+ * Iterate over an Array or an Object invoking a function for each item.
+ *
+ * If `obj` is an Array callback will be called passing
+ * the value, index, and complete array for each item.
+ *
+ * If 'obj' is an Object callback will be called passing
+ * the value, key, and complete object for each property.
+ *
+ * @param {Object|Array} obj The object to iterate
+ * @param {Function} fn The callback to invoke for each item
+ */
+function forEach(obj, fn) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  // Force an array if not already something iterable
+  if (typeof obj !== 'object') {
+    /*eslint no-param-reassign:0*/
+    obj = [obj];
+  }
+
+  if (isArray(obj)) {
+    // Iterate over array values
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    // Iterate over object keys
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+/**
+ * Accepts varargs expecting each argument to be an object, then
+ * immutably merges the properties of each object and returns result.
+ *
+ * When multiple objects contain the same key the later object in
+ * the arguments list will take precedence.
+ *
+ * Example:
+ *
+ * ```js
+ * var result = merge({foo: 123}, {foo: 456});
+ * console.log(result.foo); // outputs 456
+ * ```
+ *
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function merge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (isPlainObject(result[key]) && isPlainObject(val)) {
+      result[key] = merge(result[key], val);
+    } else if (isPlainObject(val)) {
+      result[key] = merge({}, val);
+    } else if (isArray(val)) {
+      result[key] = val.slice();
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Extends object a by mutably adding to it the properties of object b.
+ *
+ * @param {Object} a The object to be extended
+ * @param {Object} b The object to copy properties from
+ * @param {Object} thisArg The object to bind function to
+ * @return {Object} The resulting value of object a
+ */
+function extend(a, b, thisArg) {
+  forEach(b, function assignValue(val, key) {
+    if (thisArg && typeof val === 'function') {
+      a[key] = bind(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  });
+  return a;
+}
+
+/**
+ * Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
+ *
+ * @param {string} content with BOM
+ * @return {string} content value without BOM
+ */
+function stripBOM(content) {
+  if (content.charCodeAt(0) === 0xFEFF) {
+    content = content.slice(1);
+  }
+  return content;
+}
+
+module.exports = {
+  isArray: isArray,
+  isArrayBuffer: isArrayBuffer,
+  isBuffer: isBuffer,
+  isFormData: isFormData,
+  isArrayBufferView: isArrayBufferView,
+  isString: isString,
+  isNumber: isNumber,
+  isObject: isObject,
+  isPlainObject: isPlainObject,
+  isUndefined: isUndefined,
+  isDate: isDate,
+  isFile: isFile,
+  isBlob: isBlob,
+  isFunction: isFunction,
+  isStream: isStream,
+  isURLSearchParams: isURLSearchParams,
+  isStandardBrowserEnv: isStandardBrowserEnv,
+  forEach: forEach,
+  merge: merge,
+  extend: extend,
+  trim: trim,
+  stripBOM: stripBOM
+};
+
+},{"./helpers/bind":"78Fwk"}],"78Fwk":[function(require,module,exports) {
+'use strict';
+
+module.exports = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+},{}],"26bz2":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+var buildURL = require('../helpers/buildURL');
+var InterceptorManager = require('./InterceptorManager');
+var dispatchRequest = require('./dispatchRequest');
+var mergeConfig = require('./mergeConfig');
+
+/**
+ * Create a new instance of Axios
+ *
+ * @param {Object} instanceConfig The default config for the instance
+ */
+function Axios(instanceConfig) {
+  this.defaults = instanceConfig;
+  this.interceptors = {
+    request: new InterceptorManager(),
+    response: new InterceptorManager()
+  };
+}
+
+/**
+ * Dispatch a request
+ *
+ * @param {Object} config The config specific for this request (merged with this.defaults)
+ */
+Axios.prototype.request = function request(config) {
+  /*eslint no-param-reassign:0*/
+  // Allow for axios('example/url'[, config]) a la fetch API
+  if (typeof config === 'string') {
+    config = arguments[1] || {};
+    config.url = arguments[0];
+  } else {
+    config = config || {};
+  }
+
+  config = mergeConfig(this.defaults, config);
+
+  // Set config.method
+  if (config.method) {
+    config.method = config.method.toLowerCase();
+  } else if (this.defaults.method) {
+    config.method = this.defaults.method.toLowerCase();
+  } else {
+    config.method = 'get';
+  }
+
+  // Hook up interceptors middleware
+  var chain = [dispatchRequest, undefined];
+  var promise = Promise.resolve(config);
+
+  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+    chain.push(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  while (chain.length) {
+    promise = promise.then(chain.shift(), chain.shift());
+  }
+
+  return promise;
+};
+
+Axios.prototype.getUri = function getUri(config) {
+  config = mergeConfig(this.defaults, config);
+  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
+};
+
+// Provide aliases for supported request methods
+utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, config) {
+    return this.request(mergeConfig(config || {}, {
+      method: method,
+      url: url,
+      data: (config || {}).data
+    }));
+  };
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, data, config) {
+    return this.request(mergeConfig(config || {}, {
+      method: method,
+      url: url,
+      data: data
+    }));
+  };
+});
+
+module.exports = Axios;
+
+},{"./../utils":"7J9rV","../helpers/buildURL":"25KfR","./InterceptorManager":"33sRR","./dispatchRequest":"1mCjo","./mergeConfig":"42z1a"}],"25KfR":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+function encode(val) {
+  return encodeURIComponent(val).
+    replace(/%3A/gi, ':').
+    replace(/%24/g, '$').
+    replace(/%2C/gi, ',').
+    replace(/%20/g, '+').
+    replace(/%5B/gi, '[').
+    replace(/%5D/gi, ']');
+}
+
+/**
+ * Build a URL by appending params to the end
+ *
+ * @param {string} url The base of the url (e.g., http://www.google.com)
+ * @param {object} [params] The params to be appended
+ * @returns {string} The formatted url
+ */
+module.exports = function buildURL(url, params, paramsSerializer) {
+  /*eslint no-param-reassign:0*/
+  if (!params) {
+    return url;
+  }
+
+  var serializedParams;
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params);
+  } else if (utils.isURLSearchParams(params)) {
+    serializedParams = params.toString();
+  } else {
+    var parts = [];
+
+    utils.forEach(params, function serialize(val, key) {
+      if (val === null || typeof val === 'undefined') {
+        return;
+      }
+
+      if (utils.isArray(val)) {
+        key = key + '[]';
+      } else {
+        val = [val];
+      }
+
+      utils.forEach(val, function parseValue(v) {
+        if (utils.isDate(v)) {
+          v = v.toISOString();
+        } else if (utils.isObject(v)) {
+          v = JSON.stringify(v);
+        }
+        parts.push(encode(key) + '=' + encode(v));
+      });
+    });
+
+    serializedParams = parts.join('&');
+  }
+
+  if (serializedParams) {
+    var hashmarkIndex = url.indexOf('#');
+    if (hashmarkIndex !== -1) {
+      url = url.slice(0, hashmarkIndex);
+    }
+
+    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+  }
+
+  return url;
+};
+
+},{"./../utils":"7J9rV"}],"33sRR":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+function InterceptorManager() {
+  this.handlers = [];
+}
+
+/**
+ * Add a new interceptor to the stack
+ *
+ * @param {Function} fulfilled The function to handle `then` for a `Promise`
+ * @param {Function} rejected The function to handle `reject` for a `Promise`
+ *
+ * @return {Number} An ID used to remove interceptor later
+ */
+InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected
+  });
+  return this.handlers.length - 1;
+};
+
+/**
+ * Remove an interceptor from the stack
+ *
+ * @param {Number} id The ID that was returned by `use`
+ */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+/**
+ * Iterate over all the registered interceptors
+ *
+ * This method is particularly useful for skipping over any
+ * interceptors that may have become `null` calling `eject`.
+ *
+ * @param {Function} fn The function to call for each interceptor
+ */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+
+module.exports = InterceptorManager;
+
+},{"./../utils":"7J9rV"}],"1mCjo":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+var transformData = require('./transformData');
+var isCancel = require('../cancel/isCancel');
+var defaults = require('../defaults');
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+function throwIfCancellationRequested(config) {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested();
+  }
+}
+
+/**
+ * Dispatch a request to the server using the configured adapter.
+ *
+ * @param {object} config The config that is to be used for the request
+ * @returns {Promise} The Promise to be fulfilled
+ */
+module.exports = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+
+  // Ensure headers exist
+  config.headers = config.headers || {};
+
+  // Transform request data
+  config.data = transformData(
+    config.data,
+    config.headers,
+    config.transformRequest
+  );
+
+  // Flatten headers
+  config.headers = utils.merge(
+    config.headers.common || {},
+    config.headers[config.method] || {},
+    config.headers
+  );
+
+  utils.forEach(
+    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+    function cleanHeaderConfig(method) {
+      delete config.headers[method];
+    }
+  );
+
+  var adapter = config.adapter || defaults.adapter;
+
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // Transform response data
+    response.data = transformData(
+      response.data,
+      response.headers,
+      config.transformResponse
+    );
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData(
+          reason.response.data,
+          reason.response.headers,
+          config.transformResponse
+        );
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+};
+
+},{"./../utils":"7J9rV","./transformData":"1ueU6","../cancel/isCancel":"3MAgn","../defaults":"5j10E"}],"1ueU6":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+/**
+ * Transform the data for a request or a response
+ *
+ * @param {Object|String} data The data to be transformed
+ * @param {Array} headers The headers for the request or response
+ * @param {Array|Function} fns A single function or Array of functions
+ * @returns {*} The resulting transformed data
+ */
+module.exports = function transformData(data, headers, fns) {
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn(data, headers);
+  });
+
+  return data;
+};
+
+},{"./../utils":"7J9rV"}],"3MAgn":[function(require,module,exports) {
+'use strict';
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+},{}],"5j10E":[function(require,module,exports) {
+"use strict";
+var process = require("process");
+var utils = require('./utils');
+var normalizeHeaderName = require('./helpers/normalizeHeaderName');
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = require('./adapters/xhr');
+  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
+    // For node use HTTP adapter
+    adapter = require('./adapters/http');
+  }
+  return adapter;
+}
+var defaults = {
+  adapter: getDefaultAdapter(),
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Accept');
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) || utils.isArrayBuffer(data) || utils.isBuffer(data) || utils.isStream(data) || utils.isFile(data) || utils.isBlob(data)) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) {}
+    }
+    return data;
+  }],
+  /**
+  * A timeout in milliseconds to abort a request. If set to 0 (default) a
+  * timeout is not created.
+  */
+  timeout: 0,
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+  maxContentLength: -1,
+  maxBodyLength: -1,
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+module.exports = defaults;
+
+},{"process":"7AgFc","./utils":"7J9rV","./helpers/normalizeHeaderName":"5yMqL","./adapters/xhr":"6pJqL","./adapters/http":"6pJqL"}],"7AgFc":[function(require,module,exports) {
+// shim for using process in browser
+var process = module.exports = {};
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+var cachedSetTimeout;
+var cachedClearTimeout;
+function defaultSetTimout() {
+  throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout() {
+  throw new Error('clearTimeout has not been defined');
+}
+(function () {
+  try {
+    if (typeof setTimeout === 'function') {
+      cachedSetTimeout = setTimeout;
+    } else {
+      cachedSetTimeout = defaultSetTimout;
+    }
+  } catch (e) {
+    cachedSetTimeout = defaultSetTimout;
+  }
+  try {
+    if (typeof clearTimeout === 'function') {
+      cachedClearTimeout = clearTimeout;
+    } else {
+      cachedClearTimeout = defaultClearTimeout;
+    }
+  } catch (e) {
+    cachedClearTimeout = defaultClearTimeout;
+  }
+})();
+function runTimeout(fun) {
+  if (cachedSetTimeout === setTimeout) {
+    // normal enviroments in sane situations
+    return setTimeout(fun, 0);
+  }
+  // if setTimeout wasn't available but was latter defined
+  if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+    cachedSetTimeout = setTimeout;
+    return setTimeout(fun, 0);
+  }
+  try {
+    // when when somebody has screwed with setTimeout but no I.E. maddness
+    return cachedSetTimeout(fun, 0);
+  } catch (e) {
+    try {
+      // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+      return cachedSetTimeout.call(null, fun, 0);
+    } catch (e) {
+      // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+      return cachedSetTimeout.call(this, fun, 0);
+    }
+  }
+}
+function runClearTimeout(marker) {
+  if (cachedClearTimeout === clearTimeout) {
+    // normal enviroments in sane situations
+    return clearTimeout(marker);
+  }
+  // if clearTimeout wasn't available but was latter defined
+  if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+    cachedClearTimeout = clearTimeout;
+    return clearTimeout(marker);
+  }
+  try {
+    // when when somebody has screwed with setTimeout but no I.E. maddness
+    return cachedClearTimeout(marker);
+  } catch (e) {
+    try {
+      // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+      return cachedClearTimeout.call(null, marker);
+    } catch (e) {
+      // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+      // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+      return cachedClearTimeout.call(this, marker);
+    }
+  }
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+function cleanUpNextTick() {
+  if (!draining || !currentQueue) {
+    return;
+  }
+  draining = false;
+  if (currentQueue.length) {
+    queue = currentQueue.concat(queue);
+  } else {
+    queueIndex = -1;
+  }
+  if (queue.length) {
+    drainQueue();
+  }
+}
+function drainQueue() {
+  if (draining) {
+    return;
+  }
+  var timeout = runTimeout(cleanUpNextTick);
+  draining = true;
+  var len = queue.length;
+  while (len) {
+    currentQueue = queue;
+    queue = [];
+    while (++queueIndex < len) {
+      if (currentQueue) {
+        currentQueue[queueIndex].run();
+      }
+    }
+    queueIndex = -1;
+    len = queue.length;
+  }
+  currentQueue = null;
+  draining = false;
+  runClearTimeout(timeout);
+}
+process.nextTick = function (fun) {
+  var args = new Array(arguments.length - 1);
+  if (arguments.length > 1) {
+    for (var i = 1; i < arguments.length; i++) {
+      args[i - 1] = arguments[i];
+    }
+  }
+  queue.push(new Item(fun, args));
+  if (queue.length === 1 && !draining) {
+    runTimeout(drainQueue);
+  }
+};
+// v8 likes predictible objects
+function Item(fun, array) {
+  this.fun = fun;
+  this.array = array;
+}
+Item.prototype.run = function () {
+  this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = '';
+// empty string to avoid regexp issues
+process.versions = {};
+function noop() {}
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+process.listeners = function (name) {
+  return [];
+};
+process.binding = function (name) {
+  throw new Error('process.binding is not supported');
+};
+process.cwd = function () {
+  return '/';
+};
+process.chdir = function (dir) {
+  throw new Error('process.chdir is not supported');
+};
+process.umask = function () {
+  return 0;
+};
+
+},{}],"5yMqL":[function(require,module,exports) {
+'use strict';
+
+var utils = require('../utils');
+
+module.exports = function normalizeHeaderName(headers, normalizedName) {
+  utils.forEach(headers, function processHeader(value, name) {
+    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+      headers[normalizedName] = value;
+      delete headers[name];
+    }
+  });
+};
+
+},{"../utils":"7J9rV"}],"6pJqL":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+var settle = require('./../core/settle');
+var cookies = require('./../helpers/cookies');
+var buildURL = require('./../helpers/buildURL');
+var buildFullPath = require('../core/buildFullPath');
+var parseHeaders = require('./../helpers/parseHeaders');
+var isURLSameOrigin = require('./../helpers/isURLSameOrigin');
+var createError = require('../core/createError');
+
+module.exports = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+
+    if (utils.isFormData(requestData)) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
+
+    var request = new XMLHttpRequest();
+
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
+
+    var fullPath = buildFullPath(config.baseURL, config.url);
+    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    // Listen for ready state
+    request.onreadystatechange = function handleLoad() {
+      if (!request || request.readyState !== 4) {
+        return;
+      }
+
+      // The request errored out and we didn't get a response, this will be
+      // handled by onerror instead
+      // With one exception: request that using file: protocol, most browsers
+      // will return status as 0 even though it's a successful request
+      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+        return;
+      }
+
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var response = {
+        data: responseData,
+        status: request.status,
+        statusText: request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
+
+      settle(resolve, reject, response);
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle browser request cancellation (as opposed to a manual cancellation)
+    request.onabort = function handleAbort() {
+      if (!request) {
+        return;
+      }
+
+      reject(createError('Request aborted', config, 'ECONNABORTED', request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(createError('Network Error', config, null, request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      var timeoutErrorMessage = 'timeout of ' + config.timeout + 'ms exceeded';
+      if (config.timeoutErrorMessage) {
+        timeoutErrorMessage = config.timeoutErrorMessage;
+      }
+      reject(createError(timeoutErrorMessage, config, 'ECONNABORTED',
+        request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
+        cookies.read(config.xsrfCookieName) :
+        undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (!utils.isUndefined(config.withCredentials)) {
+      request.withCredentials = !!config.withCredentials;
+    }
+
+    // Add responseType to request if needed
+    if (config.responseType) {
+      try {
+        request.responseType = config.responseType;
+      } catch (e) {
+        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
+        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
+        if (config.responseType !== 'json') {
+          throw e;
+        }
+      }
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken) {
+      // Handle cancellation
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        if (!request) {
+          return;
+        }
+
+        request.abort();
+        reject(cancel);
+        // Clean up request
+        request = null;
+      });
+    }
+
+    if (!requestData) {
+      requestData = null;
+    }
+
+    // Send the request
+    request.send(requestData);
+  });
+};
+
+},{"./../utils":"7J9rV","./../core/settle":"72M6J","./../helpers/cookies":"1m0F1","./../helpers/buildURL":"25KfR","../core/buildFullPath":"5fWja","./../helpers/parseHeaders":"1KizL","./../helpers/isURLSameOrigin":"6Gtz3","../core/createError":"7ETv1"}],"72M6J":[function(require,module,exports) {
+'use strict';
+
+var createError = require('./createError');
+
+/**
+ * Resolve or reject a Promise based on response status.
+ *
+ * @param {Function} resolve A function that resolves the promise.
+ * @param {Function} reject A function that rejects the promise.
+ * @param {object} response The response.
+ */
+module.exports = function settle(resolve, reject, response) {
+  var validateStatus = response.config.validateStatus;
+  if (!response.status || !validateStatus || validateStatus(response.status)) {
+    resolve(response);
+  } else {
+    reject(createError(
+      'Request failed with status code ' + response.status,
+      response.config,
+      null,
+      response.request,
+      response
+    ));
+  }
+};
+
+},{"./createError":"7ETv1"}],"7ETv1":[function(require,module,exports) {
+'use strict';
+
+var enhanceError = require('./enhanceError');
+
+/**
+ * Create an Error with the specified message, config, error code, request and response.
+ *
+ * @param {string} message The error message.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+module.exports = function createError(message, config, code, request, response) {
+  var error = new Error(message);
+  return enhanceError(error, config, code, request, response);
+};
+
+},{"./enhanceError":"2O2Ud"}],"2O2Ud":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Update an Error with the specified config, error code, and response.
+ *
+ * @param {Error} error The error to update.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The error.
+ */
+module.exports = function enhanceError(error, config, code, request, response) {
+  error.config = config;
+  if (code) {
+    error.code = code;
+  }
+
+  error.request = request;
+  error.response = response;
+  error.isAxiosError = true;
+
+  error.toJSON = function toJSON() {
+    return {
+      // Standard
+      message: this.message,
+      name: this.name,
+      // Microsoft
+      description: this.description,
+      number: this.number,
+      // Mozilla
+      fileName: this.fileName,
+      lineNumber: this.lineNumber,
+      columnNumber: this.columnNumber,
+      stack: this.stack,
+      // Axios
+      config: this.config,
+      code: this.code
+    };
+  };
+  return error;
+};
+
+},{}],"1m0F1":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs support document.cookie
+    (function standardBrowserEnv() {
+      return {
+        write: function write(name, value, expires, path, domain, secure) {
+          var cookie = [];
+          cookie.push(name + '=' + encodeURIComponent(value));
+
+          if (utils.isNumber(expires)) {
+            cookie.push('expires=' + new Date(expires).toGMTString());
+          }
+
+          if (utils.isString(path)) {
+            cookie.push('path=' + path);
+          }
+
+          if (utils.isString(domain)) {
+            cookie.push('domain=' + domain);
+          }
+
+          if (secure === true) {
+            cookie.push('secure');
+          }
+
+          document.cookie = cookie.join('; ');
+        },
+
+        read: function read(name) {
+          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+          return (match ? decodeURIComponent(match[3]) : null);
+        },
+
+        remove: function remove(name) {
+          this.write(name, '', Date.now() - 86400000);
+        }
+      };
+    })() :
+
+  // Non standard browser env (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return {
+        write: function write() {},
+        read: function read() { return null; },
+        remove: function remove() {}
+      };
+    })()
+);
+
+},{"./../utils":"7J9rV"}],"5fWja":[function(require,module,exports) {
+'use strict';
+
+var isAbsoluteURL = require('../helpers/isAbsoluteURL');
+var combineURLs = require('../helpers/combineURLs');
+
+/**
+ * Creates a new URL by combining the baseURL with the requestedURL,
+ * only when the requestedURL is not already an absolute URL.
+ * If the requestURL is absolute, this function returns the requestedURL untouched.
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} requestedURL Absolute or relative URL to combine
+ * @returns {string} The combined full path
+ */
+module.exports = function buildFullPath(baseURL, requestedURL) {
+  if (baseURL && !isAbsoluteURL(requestedURL)) {
+    return combineURLs(baseURL, requestedURL);
+  }
+  return requestedURL;
+};
+
+},{"../helpers/isAbsoluteURL":"4FcN1","../helpers/combineURLs":"qMap4"}],"4FcN1":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Determines whether the specified URL is absolute
+ *
+ * @param {string} url The URL to test
+ * @returns {boolean} True if the specified URL is absolute, otherwise false
+ */
+module.exports = function isAbsoluteURL(url) {
+  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+  // by any combination of letters, digits, plus, period, or hyphen.
+  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+};
+
+},{}],"qMap4":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Creates a new URL by combining the specified URLs
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} relativeURL The relative URL
+ * @returns {string} The combined URL
+ */
+module.exports = function combineURLs(baseURL, relativeURL) {
+  return relativeURL
+    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+    : baseURL;
+};
+
+},{}],"1KizL":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+// Headers whose duplicates are ignored by node
+// c.f. https://nodejs.org/api/http.html#http_message_headers
+var ignoreDuplicateOf = [
+  'age', 'authorization', 'content-length', 'content-type', 'etag',
+  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
+  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
+  'referer', 'retry-after', 'user-agent'
+];
+
+/**
+ * Parse headers into an object
+ *
+ * ```
+ * Date: Wed, 27 Aug 2014 08:58:49 GMT
+ * Content-Type: application/json
+ * Connection: keep-alive
+ * Transfer-Encoding: chunked
+ * ```
+ *
+ * @param {String} headers Headers needing to be parsed
+ * @returns {Object} Headers parsed into an object
+ */
+module.exports = function parseHeaders(headers) {
+  var parsed = {};
+  var key;
+  var val;
+  var i;
+
+  if (!headers) { return parsed; }
+
+  utils.forEach(headers.split('\n'), function parser(line) {
+    i = line.indexOf(':');
+    key = utils.trim(line.substr(0, i)).toLowerCase();
+    val = utils.trim(line.substr(i + 1));
+
+    if (key) {
+      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
+        return;
+      }
+      if (key === 'set-cookie') {
+        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
+      } else {
+        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+      }
+    }
+  });
+
+  return parsed;
+};
+
+},{"./../utils":"7J9rV"}],"6Gtz3":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs have full support of the APIs needed to test
+  // whether the request URL is of the same origin as current location.
+    (function standardBrowserEnv() {
+      var msie = /(msie|trident)/i.test(navigator.userAgent);
+      var urlParsingNode = document.createElement('a');
+      var originURL;
+
+      /**
+    * Parse a URL to discover it's components
+    *
+    * @param {String} url The URL to be parsed
+    * @returns {Object}
+    */
+      function resolveURL(url) {
+        var href = url;
+
+        if (msie) {
+        // IE needs attribute set twice to normalize properties
+          urlParsingNode.setAttribute('href', href);
+          href = urlParsingNode.href;
+        }
+
+        urlParsingNode.setAttribute('href', href);
+
+        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+        return {
+          href: urlParsingNode.href,
+          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+          host: urlParsingNode.host,
+          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+          hostname: urlParsingNode.hostname,
+          port: urlParsingNode.port,
+          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+            urlParsingNode.pathname :
+            '/' + urlParsingNode.pathname
+        };
+      }
+
+      originURL = resolveURL(window.location.href);
+
+      /**
+    * Determine if a URL shares the same origin as the current location
+    *
+    * @param {String} requestURL The URL to test
+    * @returns {boolean} True if URL shares the same origin, otherwise false
+    */
+      return function isURLSameOrigin(requestURL) {
+        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+        return (parsed.protocol === originURL.protocol &&
+            parsed.host === originURL.host);
+      };
+    })() :
+
+  // Non standard browser envs (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return function isURLSameOrigin() {
+        return true;
+      };
+    })()
+);
+
+},{"./../utils":"7J9rV"}],"42z1a":[function(require,module,exports) {
+'use strict';
+
+var utils = require('../utils');
+
+/**
+ * Config-specific merge-function which creates a new config-object
+ * by merging two configuration objects together.
+ *
+ * @param {Object} config1
+ * @param {Object} config2
+ * @returns {Object} New object resulting from merging config2 to config1
+ */
+module.exports = function mergeConfig(config1, config2) {
+  // eslint-disable-next-line no-param-reassign
+  config2 = config2 || {};
+  var config = {};
+
+  var valueFromConfig2Keys = ['url', 'method', 'data'];
+  var mergeDeepPropertiesKeys = ['headers', 'auth', 'proxy', 'params'];
+  var defaultToConfig2Keys = [
+    'baseURL', 'transformRequest', 'transformResponse', 'paramsSerializer',
+    'timeout', 'timeoutMessage', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
+    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress', 'decompress',
+    'maxContentLength', 'maxBodyLength', 'maxRedirects', 'transport', 'httpAgent',
+    'httpsAgent', 'cancelToken', 'socketPath', 'responseEncoding'
+  ];
+  var directMergeKeys = ['validateStatus'];
+
+  function getMergedValue(target, source) {
+    if (utils.isPlainObject(target) && utils.isPlainObject(source)) {
+      return utils.merge(target, source);
+    } else if (utils.isPlainObject(source)) {
+      return utils.merge({}, source);
+    } else if (utils.isArray(source)) {
+      return source.slice();
+    }
+    return source;
+  }
+
+  function mergeDeepProperties(prop) {
+    if (!utils.isUndefined(config2[prop])) {
+      config[prop] = getMergedValue(config1[prop], config2[prop]);
+    } else if (!utils.isUndefined(config1[prop])) {
+      config[prop] = getMergedValue(undefined, config1[prop]);
+    }
+  }
+
+  utils.forEach(valueFromConfig2Keys, function valueFromConfig2(prop) {
+    if (!utils.isUndefined(config2[prop])) {
+      config[prop] = getMergedValue(undefined, config2[prop]);
+    }
+  });
+
+  utils.forEach(mergeDeepPropertiesKeys, mergeDeepProperties);
+
+  utils.forEach(defaultToConfig2Keys, function defaultToConfig2(prop) {
+    if (!utils.isUndefined(config2[prop])) {
+      config[prop] = getMergedValue(undefined, config2[prop]);
+    } else if (!utils.isUndefined(config1[prop])) {
+      config[prop] = getMergedValue(undefined, config1[prop]);
+    }
+  });
+
+  utils.forEach(directMergeKeys, function merge(prop) {
+    if (prop in config2) {
+      config[prop] = getMergedValue(config1[prop], config2[prop]);
+    } else if (prop in config1) {
+      config[prop] = getMergedValue(undefined, config1[prop]);
+    }
+  });
+
+  var axiosKeys = valueFromConfig2Keys
+    .concat(mergeDeepPropertiesKeys)
+    .concat(defaultToConfig2Keys)
+    .concat(directMergeKeys);
+
+  var otherKeys = Object
+    .keys(config1)
+    .concat(Object.keys(config2))
+    .filter(function filterAxiosKeys(key) {
+      return axiosKeys.indexOf(key) === -1;
+    });
+
+  utils.forEach(otherKeys, mergeDeepProperties);
+
+  return config;
+};
+
+},{"../utils":"7J9rV"}],"1Ql7i":[function(require,module,exports) {
+'use strict';
+
+/**
+ * A `Cancel` is an object that is thrown when an operation is canceled.
+ *
+ * @class
+ * @param {string=} message The message.
+ */
+function Cancel(message) {
+  this.message = message;
+}
+
+Cancel.prototype.toString = function toString() {
+  return 'Cancel' + (this.message ? ': ' + this.message : '');
+};
+
+Cancel.prototype.__CANCEL__ = true;
+
+module.exports = Cancel;
+
+},{}],"hHamf":[function(require,module,exports) {
+'use strict';
+
+var Cancel = require('./Cancel');
+
+/**
+ * A `CancelToken` is an object that can be used to request cancellation of an operation.
+ *
+ * @class
+ * @param {Function} executor The executor function.
+ */
+function CancelToken(executor) {
+  if (typeof executor !== 'function') {
+    throw new TypeError('executor must be a function.');
+  }
+
+  var resolvePromise;
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+  executor(function cancel(message) {
+    if (token.reason) {
+      // Cancellation has already been requested
+      return;
+    }
+
+    token.reason = new Cancel(message);
+    resolvePromise(token.reason);
+  });
+}
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+CancelToken.prototype.throwIfRequested = function throwIfRequested() {
+  if (this.reason) {
+    throw this.reason;
+  }
+};
+
+/**
+ * Returns an object that contains a new `CancelToken` and a function that, when called,
+ * cancels the `CancelToken`.
+ */
+CancelToken.source = function source() {
+  var cancel;
+  var token = new CancelToken(function executor(c) {
+    cancel = c;
+  });
+  return {
+    token: token,
+    cancel: cancel
+  };
+};
+
+module.exports = CancelToken;
+
+},{"./Cancel":"1Ql7i"}],"9FoXt":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Syntactic sugar for invoking a function and expanding an array for arguments.
+ *
+ * Common use case would be to use `Function.prototype.apply`.
+ *
+ *  ```js
+ *  function f(x, y, z) {}
+ *  var args = [1, 2, 3];
+ *  f.apply(null, args);
+ *  ```
+ *
+ * With `spread` this example can be re-written.
+ *
+ *  ```js
+ *  spread(function(x, y, z) {})([1, 2, 3]);
+ *  ```
+ *
+ * @param {Function} callback
+ * @returns {Function}
+ */
+module.exports = function spread(callback) {
+  return function wrap(arr) {
+    return callback.apply(null, arr);
+  };
+};
+
+},{}],"1bzv8":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Determines whether the payload is an error thrown by Axios
+ *
+ * @param {*} payload The value to test
+ * @returns {boolean} True if the payload is an error thrown by Axios, otherwise false
+ */
+module.exports = function isAxiosError(payload) {
+  return (typeof payload === 'object') && (payload.isAxiosError === true);
+};
+
+},{}],"AWzhP":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+const apiUrl = 'https://moviesapi-node.herokuapp.com';
+exports.default = apiUrl;
+
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"67atH":[function(require,module,exports) {
 "use strict";
 if ("development" === 'production') {
   module.exports = require('./formik.cjs.production.min.js');
@@ -94961,61 +95287,7 @@ function cloneDeep(value) {
 
 module.exports = cloneDeep;
 
-},{"./_baseClone":"3P5zz"}],"1NB9z":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-var _reactRedux = require('react-redux');
-var _reduxActionsActions = require('../redux/actions/actions');
-var _useRequest = require('./useRequest');
-var _useRequestDefault = _parcelHelpers.interopDefault(_useRequest);
-var _s = $RefreshSig$();
-const useUserDetails = () => {
-  _s();
-  const dispatch = _reactRedux.useDispatch();
-  const apiRequest = _useRequestDefault.default();
-  const getUserDetails = async name => {
-    try {
-      const response = await apiRequest('GET', `/users/${name}`);
-      dispatch(_reduxActionsActions.setUserDetails(response.data));
-    } catch (error) {
-      dispatch(_reduxActionsActions.setError(error));
-    }
-  };
-  return getUserDetails;
-};
-_s(useUserDetails, "0B7un8LRXp4/z++nGO/wEr3C7jw=", false, function () {
-  return [_reactRedux.useDispatch, _useRequestDefault.default];
-});
-exports.default = useUserDetails;
-
-},{"react-redux":"7GDa4","../redux/actions/actions":"2QXPk","./useRequest":"2iXqm","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"7L5z8":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-var _reactRedux = require('react-redux');
-var _reduxActionsActions = require('../redux/actions/actions');
-var _useRequest = require('./useRequest');
-var _useRequestDefault = _parcelHelpers.interopDefault(_useRequest);
-var _s = $RefreshSig$();
-const useMovies = () => {
-  _s();
-  const dispatch = _reactRedux.useDispatch();
-  const apiRequest = _useRequestDefault.default();
-  const getMovies = async () => {
-    try {
-      const response = await apiRequest('GET', '/movies');
-      dispatch(_reduxActionsActions.setMovies(response.data));
-    } catch (error) {
-      dispatch(_reduxActionsActions.setError(error));
-    }
-  };
-  return getMovies;
-};
-_s(useMovies, "0B7un8LRXp4/z++nGO/wEr3C7jw=", false, function () {
-  return [_reactRedux.useDispatch, _useRequestDefault.default];
-});
-exports.default = useMovies;
-
-},{"react-redux":"7GDa4","../redux/actions/actions":"2QXPk","./useRequest":"2iXqm","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y"}],"7gvH2":[function(require,module,exports) {
+},{"./_baseClone":"3P5zz"}],"7gvH2":[function(require,module,exports) {
 var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -95061,27 +95333,20 @@ try {
       }
     };
     return (
-      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 39,
           columnNumber: 5
         }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 40,
-          columnNumber: 7
-        }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         className: "registration-view",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 41,
-          columnNumber: 9
+          lineNumber: 40,
+          columnNumber: 7
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "d-flex flex-column justify-content-center align-items-center",
@@ -95089,15 +95354,15 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 42,
-          columnNumber: 11
+          lineNumber: 41,
+          columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement("h1", {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 43,
-          columnNumber: 13
+          lineNumber: 42,
+          columnNumber: 11
         }
       }, "MyFlix")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "d-flex flex-column justify-content-center align-items-center",
@@ -95105,31 +95370,31 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 45,
-          columnNumber: 11
+          lineNumber: 44,
+          columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card, {
         className: "registration-card",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 46,
-          columnNumber: 13
+          lineNumber: 45,
+          columnNumber: 11
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Header, {
         className: "registration-card__header",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 47,
-          columnNumber: 15
+          lineNumber: 46,
+          columnNumber: 13
         }
       }, "Sign Up"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Body, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 50,
-          columnNumber: 15
+          lineNumber: 49,
+          columnNumber: 13
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_formik.Formik, {
         validate: _utilsRegisterValidationDefault.default,
@@ -95144,45 +95409,45 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 51,
-          columnNumber: 17
+          lineNumber: 50,
+          columnNumber: 15
         }
       }, ({handleSubmit, handleChange, handleBlur, touched, values, errors}) => /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 70,
-          columnNumber: 23
+          lineNumber: 69,
+          columnNumber: 21
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formUsername",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 71,
-          columnNumber: 25
+          lineNumber: 70,
+          columnNumber: 23
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 72,
-          columnNumber: 27
+          lineNumber: 71,
+          columnNumber: 25
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "registration-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 73,
-          columnNumber: 29
+          lineNumber: 72,
+          columnNumber: 27
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapIcons.PersonFill, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 74,
-          columnNumber: 31
+          lineNumber: 73,
+          columnNumber: 29
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         isInvalid: touched.username && !!errors.username,
@@ -95195,39 +95460,39 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 76,
-          columnNumber: 29
+          lineNumber: 75,
+          columnNumber: 27
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 82,
-          columnNumber: 29
+          lineNumber: 81,
+          columnNumber: 27
         }
       }, errors.username))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formEmail",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 88,
-          columnNumber: 25
+          lineNumber: 87,
+          columnNumber: 23
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 89,
-          columnNumber: 27
+          lineNumber: 88,
+          columnNumber: 25
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "registration-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 90,
-          columnNumber: 29
+          lineNumber: 89,
+          columnNumber: 27
         }
       }, "@"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         isInvalid: touched.email && !!errors.email,
@@ -95240,47 +95505,47 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 93,
-          columnNumber: 29
+          lineNumber: 92,
+          columnNumber: 27
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 99,
-          columnNumber: 29
+          lineNumber: 98,
+          columnNumber: 27
         }
       }, errors.email))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formPassword",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 105,
-          columnNumber: 25
+          lineNumber: 104,
+          columnNumber: 23
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         className: "mb-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 106,
-          columnNumber: 27
+          lineNumber: 105,
+          columnNumber: 25
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "registration-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 107,
-          columnNumber: 29
+          lineNumber: 106,
+          columnNumber: 27
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapIcons.KeyFill, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 108,
-          columnNumber: 31
+          lineNumber: 107,
+          columnNumber: 29
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         isInvalid: touched.password && !!errors.password,
@@ -95294,47 +95559,47 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 110,
-          columnNumber: 29
+          lineNumber: 109,
+          columnNumber: 27
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 117,
-          columnNumber: 29
+          lineNumber: 116,
+          columnNumber: 27
         }
       }, errors.password))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formPasswordConfirmation",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 123,
-          columnNumber: 25
+          lineNumber: 122,
+          columnNumber: 23
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         className: "mb-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 124,
-          columnNumber: 27
+          lineNumber: 123,
+          columnNumber: 25
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "registration-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 125,
-          columnNumber: 29
+          lineNumber: 124,
+          columnNumber: 27
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapIcons.KeyFill, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 126,
-          columnNumber: 31
+          lineNumber: 125,
+          columnNumber: 29
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         isInvalid: touched.passwordConfirmation && !!errors.passwordConfirmation,
@@ -95348,46 +95613,46 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 128,
-          columnNumber: 29
+          lineNumber: 127,
+          columnNumber: 27
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 135,
-          columnNumber: 29
+          lineNumber: 134,
+          columnNumber: 27
         }
       }, errors.passwordConfirmation))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formBirthday",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 141,
-          columnNumber: 25
+          lineNumber: 140,
+          columnNumber: 23
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 142,
-          columnNumber: 27
+          lineNumber: 141,
+          columnNumber: 25
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "registration-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 143,
-          columnNumber: 29
+          lineNumber: 142,
+          columnNumber: 27
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapIcons.Calendar2DateFill, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 144,
-          columnNumber: 31
+          lineNumber: 143,
+          columnNumber: 29
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         isInvalid: touched.birthday && !!errors.birthday,
@@ -95400,16 +95665,16 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 146,
-          columnNumber: 29
+          lineNumber: 145,
+          columnNumber: 27
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 152,
-          columnNumber: 29
+          lineNumber: 151,
+          columnNumber: 27
         }
       }, errors.birthday))), loading ? /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Spinner, {
         className: "float-right",
@@ -95418,8 +95683,8 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 159,
-          columnNumber: 25
+          lineNumber: 158,
+          columnNumber: 23
         }
       }) : /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
         className: "float-right",
@@ -95429,25 +95694,25 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 161,
-          columnNumber: 25
+          lineNumber: 160,
+          columnNumber: 23
         }
       }, "SignUp")))), !loading && /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Footer, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 168,
-          columnNumber: 27
+          lineNumber: 167,
+          columnNumber: 25
         }
       }, "Do you have an account? ", /*#__PURE__*/_reactDefault.default.createElement(_reactRouterDom.Link, {
         to: "/",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 168,
-          columnNumber: 64
+          lineNumber: 167,
+          columnNumber: 62
         }
-      }, "Sign In")))))))
+      }, "Sign In"))))))
     );
   }
   _s(RegistrationView, "BjGkPbH8rtAB9Jn2P05nQ5muwYc=", false, function () {
@@ -95508,41 +95773,23 @@ try {
   _parcelHelpers.defineInteropFlag(exports);
   var _react = require('react');
   var _reactDefault = _parcelHelpers.interopDefault(_react);
-  var _reactRedux = require('react-redux');
   var _reactBootstrap = require('react-bootstrap');
-  var _movieCardMovieCard = require('../movie-card/movie-card');
-  var _movieCardMovieCardDefault = _parcelHelpers.interopDefault(_movieCardMovieCard);
+  var _propTypes = require('prop-types');
+  var _propTypesDefault = _parcelHelpers.interopDefault(_propTypes);
   require('./director-view.scss');
   var _moment = require('moment');
   var _momentDefault = _parcelHelpers.interopDefault(_moment);
-  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/director-view/director-view.jsx", _s = $RefreshSig$();
+  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/director-view/director-view.jsx";
   function DirectorView(props) {
-    _s();
-    const {match, history} = props;
-    const movies = _reactRedux.useSelector(state => state.movies);
-    const movie = movies.find(movie => movie.Director.Name === match.params.name);
+    const {director, onBackButton} = props;
     return (
       /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 15,
-          columnNumber: 5
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 17,
-          columnNumber: 7
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         className: "director-view d-flex flex-column justify-content-center align-items-center",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 18,
-          columnNumber: 9
+          lineNumber: 11,
+          columnNumber: 5
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         md: 10,
@@ -95550,125 +95797,89 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 19,
-          columnNumber: 11
+          lineNumber: 12,
+          columnNumber: 7
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         p: 5,
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 20,
-          columnNumber: 13
+          lineNumber: 13,
+          columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "m-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 21,
-          columnNumber: 15
+          lineNumber: 14,
+          columnNumber: 11
         }
-      }, "Name: ", movie?.Director?.Name)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+      }, "Name: ", director.Name)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 25,
-          columnNumber: 13
+          lineNumber: 18,
+          columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "m-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 26,
-          columnNumber: 15
+          lineNumber: 19,
+          columnNumber: 11
         }
-      }, "Birthdate: ", _momentDefault.default(movie?.Director?.Birth).format('DD-MM-YYYY'))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+      }, "Birthdate: ", _momentDefault.default(director?.Birth).format('DD-MM-YYYY'))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 23,
+          columnNumber: 9
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+        className: "m-2",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 24,
+          columnNumber: 11
+        }
+      }, "Description: ", director.Bio)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 28,
+          columnNumber: 9
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 29,
+          columnNumber: 11
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
+        onClick: onBackButton,
         __self: this,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 30,
           columnNumber: 13
         }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        className: "m-2",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 31,
-          columnNumber: 15
-        }
-      }, "Description: ", movie?.Director?.Bio)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 35,
-          columnNumber: 13
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 36,
-          columnNumber: 15
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
-        onClick: () => history.goBack(),
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 37,
-          columnNumber: 17
-        }
-      }, "Back"))))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        className: "d-flex justify-content-center",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 42,
-          columnNumber: 9
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement("h4", {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 43,
-          columnNumber: 11
-        }
-      }, match.params.name, "'s Movies")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        className: "director-movies d-flex justify-content-center",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 45,
-          columnNumber: 9
-        }
-      }, movies.filter(movie => movie.Director.Name === match.params.name).map(movie => /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        className: "d-flex justify-content-center align-items-center",
-        md: 3,
-        key: movie._id,
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 47,
-          columnNumber: 13
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_movieCardMovieCardDefault.default, {
-        movie: movie,
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 48,
-          columnNumber: 15
-        }
-      }))))))
+      }, "Back")))))
     );
   }
-  _s(DirectorView, "eStvhP8slTt+s7x6M95dK6yXYA4=", false, function () {
-    return [_reactRedux.useSelector];
-  });
   _c = DirectorView;
+  DirectorView.propTypes = {
+    director: _propTypesDefault.default.shape({
+      Name: _propTypesDefault.default.string.isRequired,
+      Birth: _propTypesDefault.default.string.isRequired,
+      Bio: _propTypesDefault.default.string.isRequired
+    }),
+    onBackButton: _propTypesDefault.default.func.isRequired
+  };
   exports.default = DirectorView;
   var _c;
   $RefreshReg$(_c, "DirectorView");
@@ -95678,7 +95889,7 @@ try {
   window.$RefreshSig$ = prevRefreshSig;
 }
 
-},{"react":"3b2NM","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","react-bootstrap":"4n7hB","./director-view.scss":"4ddkX","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","moment":"5Hi32","react-redux":"7GDa4","../movie-card/movie-card":"7v6h3"}],"4ddkX":[function() {},{}],"5Hi32":[function(require,module,exports) {
+},{"react":"3b2NM","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","react-bootstrap":"4n7hB","./director-view.scss":"4ddkX","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","prop-types":"4dfy5","moment":"5Hi32"}],"4ddkX":[function() {},{}],"5Hi32":[function(require,module,exports) {
 var define;
 // ! moment.js
 // ! version : 2.29.1
@@ -99673,7 +99884,7 @@ var define;
   return hooks;
 });
 
-},{}],"7v6h3":[function(require,module,exports) {
+},{}],"6FLqj":[function(require,module,exports) {
 var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -99683,117 +99894,21 @@ try {
   _parcelHelpers.defineInteropFlag(exports);
   var _react = require('react');
   var _reactDefault = _parcelHelpers.interopDefault(_react);
+  var _reactBootstrap = require('react-bootstrap');
   var _propTypes = require('prop-types');
   var _propTypesDefault = _parcelHelpers.interopDefault(_propTypes);
-  var _reactBootstrap = require('react-bootstrap');
-  var _reactRouterDom = require('react-router-dom');
-  require('./movie-card.scss');
-  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/movie-card/movie-card.jsx", _s = $RefreshSig$();
-  function MovieCard(props) {
-    _s();
-    const history = _reactRouterDom.useHistory();
-    const {movie} = props;
-    return (
-      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card, {
-        className: "movie-card",
-        onClick: () => history.push(`/movies/${movie._id}`),
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 12,
-          columnNumber: 5
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Img, {
-        src: movie.ImagePath,
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 13,
-          columnNumber: 7
-        }
-      }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Body, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 14,
-          columnNumber: 7
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Text, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 15,
-          columnNumber: 9
-        }
-      }, movie.Title)))
-    );
-  }
-  _s(MovieCard, "9cZfZ04734qoCGIctmKX7+sX6eU=", false, function () {
-    return [_reactRouterDom.useHistory];
-  });
-  _c = MovieCard;
-  ;
-  MovieCard.propTypes = {
-    movie: _propTypesDefault.default.shape({
-      Title: _propTypesDefault.default.string.isRequired,
-      Genre: _propTypesDefault.default.shape({
-        Name: _propTypesDefault.default.string.isRequired
-      }),
-      ImagePath: _propTypesDefault.default.string.isRequired
-    }).isRequired
-  };
-  exports.default = MovieCard;
-  var _c;
-  $RefreshReg$(_c, "MovieCard");
-  helpers.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-
-},{"react":"3b2NM","prop-types":"4dfy5","react-bootstrap":"4n7hB","react-router-dom":"1PMSK","./movie-card.scss":"43n4t","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f"}],"43n4t":[function() {},{}],"6FLqj":[function(require,module,exports) {
-var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-helpers.prelude(module);
-try {
-  var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-  _parcelHelpers.defineInteropFlag(exports);
-  var _react = require('react');
-  var _reactDefault = _parcelHelpers.interopDefault(_react);
-  var _reactRedux = require('react-redux');
-  var _reactBootstrap = require('react-bootstrap');
-  var _movieCardMovieCard = require('../movie-card/movie-card');
-  var _movieCardMovieCardDefault = _parcelHelpers.interopDefault(_movieCardMovieCard);
   require('./genre-view.scss');
-  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/genre-view/genre-view.jsx", _s = $RefreshSig$();
+  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/genre-view/genre-view.jsx";
   function GenreView(props) {
-    _s();
-    const {match, history} = props;
-    const movies = _reactRedux.useSelector(state => state.movies);
-    const movie = movies.find(movie => movie.Genre.Name === match.params.name);
+    const {genre, onBackButton} = props;
     return (
       /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 14,
-          columnNumber: 5
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 16,
-          columnNumber: 7
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         className: "genre-view d-flex flex-column justify-content-center align-items-center",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 17,
-          columnNumber: 9
+          lineNumber: 10,
+          columnNumber: 5
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         md: 10,
@@ -99801,110 +99916,73 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 18,
-          columnNumber: 11
+          lineNumber: 11,
+          columnNumber: 7
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         p: 5,
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 19,
-          columnNumber: 13
+          lineNumber: 12,
+          columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         className: "m-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 20,
-          columnNumber: 15
+          lineNumber: 13,
+          columnNumber: 11
         }
-      }, "Name: ", movie?.Genre?.Name)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+      }, "Name: ", genre.Name)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 17,
+          columnNumber: 9
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+        className: "m-2",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 18,
+          columnNumber: 11
+        }
+      }, "Description: ", genre.Description)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 22,
+          columnNumber: 9
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 23,
+          columnNumber: 11
+        }
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
+        onClick: onBackButton,
         __self: this,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 24,
           columnNumber: 13
         }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        className: "m-2",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 25,
-          columnNumber: 15
-        }
-      }, "Description: ", movie?.Genre?.Description)), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 29,
-          columnNumber: 13
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 30,
-          columnNumber: 15
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
-        onClick: () => history.goBack(),
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 31,
-          columnNumber: 17
-        }
-      }, "Back"))))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        className: "d-flex justify-content-center",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 36,
-          columnNumber: 9
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement("h4", {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 37,
-          columnNumber: 11
-        }
-      }, match.params.name, " Movies")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        className: "genre-movies d-flex justify-content-center",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 39,
-          columnNumber: 9
-        }
-      }, movies.filter(movie => movie.Genre.Name === match.params.name).map(movie => /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        className: "d-flex justify-content-center align-items-center",
-        md: 3,
-        key: movie._id,
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 41,
-          columnNumber: 13
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_movieCardMovieCardDefault.default, {
-        movie: movie,
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 42,
-          columnNumber: 15
-        }
-      }))))))
+      }, "Back")))))
     );
   }
-  _s(GenreView, "eStvhP8slTt+s7x6M95dK6yXYA4=", false, function () {
-    return [_reactRedux.useSelector];
-  });
   _c = GenreView;
+  GenreView.propTypes = {
+    genre: _propTypesDefault.default.shape({
+      Name: _propTypesDefault.default.string.isRequired,
+      Description: _propTypesDefault.default.string.isRequired
+    }),
+    onBackButton: _propTypesDefault.default.func.isRequired
+  };
   exports.default = GenreView;
   var _c;
   $RefreshReg$(_c, "GenreView");
@@ -99914,7 +99992,7 @@ try {
   window.$RefreshSig$ = prevRefreshSig;
 }
 
-},{"react":"3b2NM","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","react-bootstrap":"4n7hB","./genre-view.scss":"4iHPp","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","react-redux":"7GDa4","../movie-card/movie-card":"7v6h3"}],"4iHPp":[function() {},{}],"3CncI":[function(require,module,exports) {
+},{"react":"3b2NM","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","react-bootstrap":"4n7hB","./genre-view.scss":"4iHPp","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","prop-types":"4dfy5"}],"4iHPp":[function() {},{}],"3CncI":[function(require,module,exports) {
 var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -99928,6 +100006,8 @@ try {
   var _reactBootstrap = require('react-bootstrap');
   var _reactBootstrapIcons = require('react-bootstrap-icons');
   var _formik = require('formik');
+  var _propTypes = require('prop-types');
+  var _propTypesDefault = _parcelHelpers.interopDefault(_propTypes);
   var _reduxActionsActions = require('../../redux/actions/actions');
   var _hooksUseRequest = require('../../hooks/useRequest');
   var _hooksUseRequestDefault = _parcelHelpers.interopDefault(_hooksUseRequest);
@@ -99937,22 +100017,20 @@ try {
   var _urlImgUserSvgDefault = _parcelHelpers.interopDefault(_urlImgUserSvg);
   var _modalModal = require('../modal/modal');
   var _modalModalDefault = _parcelHelpers.interopDefault(_modalModal);
-  var _hooksUseLogOut = require('../../hooks/useLogOut');
-  var _hooksUseLogOutDefault = _parcelHelpers.interopDefault(_hooksUseLogOut);
   require('./profile-view.scss');
   var _moment = require('moment');
   var _momentDefault = _parcelHelpers.interopDefault(_moment);
   var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/profile-view/profile-view.jsx", _s = $RefreshSig$();
-  function Profile() {
+  function Profile(props) {
     _s();
-    const onLoggedOut = _hooksUseLogOutDefault.default();
     const dispatch = _reactRedux.useDispatch();
     const apiRequest = _hooksUseRequestDefault.default();
+    const {onLoggedOut} = props;
     const [loading, setLoading] = _react.useState(false);
     const [showModal, setShowModal] = _react.useState(false);
     const [update, setUpdate] = _react.useState(false);
     const userDetails = _reactRedux.useSelector(state => state.userDetails);
-    const onDeleteAcc = async () => {
+    onDeleteAcc = async () => {
       setLoading(true);
       try {
         await apiRequest('DELETE', `/users/${userDetails.Username}`);
@@ -99964,7 +100042,7 @@ try {
         dispatch(_reduxActionsActions.setError(error));
       }
     };
-    const handleSubmit = async values => {
+    handleSubmit = async values => {
       setLoading(true);
       try {
         const response = await apiRequest('PUT', `/users/${userDetails.Username}`, {
@@ -99994,6 +100072,7 @@ try {
     };
     return (
       /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+        className: "profile-view d-flex justify-content-center align-items-center",
         __self: this,
         __source: {
           fileName: _jsxFileName,
@@ -100001,35 +100080,20 @@ try {
           columnNumber: 5
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 62,
-          columnNumber: 7
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        className: "profile-view d-flex justify-content-center align-items-center",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 63,
-          columnNumber: 9
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         md: 4,
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 64,
-          columnNumber: 11
+          lineNumber: 61,
+          columnNumber: 7
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card, {
         className: "profile-card text-center",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 65,
-          columnNumber: 13
+          lineNumber: 62,
+          columnNumber: 9
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Img, {
         variant: "top",
@@ -100038,15 +100102,15 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 66,
-          columnNumber: 15
+          lineNumber: 63,
+          columnNumber: 11
         }
       }), loading ? /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Body, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 67,
-          columnNumber: 26
+          lineNumber: 64,
+          columnNumber: 22
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Spinner, {
         animation: "grow",
@@ -100054,15 +100118,15 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 68,
-          columnNumber: 17
+          lineNumber: 65,
+          columnNumber: 13
         }
       })) : update ? /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Body, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 72,
-          columnNumber: 15
+          lineNumber: 69,
+          columnNumber: 11
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
         className: "m-2",
@@ -100070,15 +100134,15 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 73,
-          columnNumber: 17
+          lineNumber: 70,
+          columnNumber: 13
         }
       }, "Cancel Update")) : /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Body, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 76,
-          columnNumber: 15
+          lineNumber: 73,
+          columnNumber: 11
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
         className: "m-2",
@@ -100086,8 +100150,8 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 77,
-          columnNumber: 17
+          lineNumber: 74,
+          columnNumber: 13
         }
       }, "Update"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
         variant: "danger",
@@ -100096,40 +100160,40 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 78,
-          columnNumber: 17
+          lineNumber: 75,
+          columnNumber: 13
         }
       }, "Delete my account")))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         md: 8,
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 82,
-          columnNumber: 11
+          lineNumber: 79,
+          columnNumber: 7
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card, {
         className: "profile-card",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 83,
-          columnNumber: 13
+          lineNumber: 80,
+          columnNumber: 9
         }
       }, update ? /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         className: "d-flex justify-content-center align-items-center",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 85,
-          columnNumber: 17
+          lineNumber: 82,
+          columnNumber: 13
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         md: 8,
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 86,
-          columnNumber: 19
+          lineNumber: 83,
+          columnNumber: 15
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_formik.Formik, {
         validate: _utilsRegisterValidationDefault.default,
@@ -100144,45 +100208,45 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 87,
-          columnNumber: 21
+          lineNumber: 84,
+          columnNumber: 17
         }
       }, ({handleSubmit, handleChange, handleBlur, touched, values, errors}) => /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 106,
-          columnNumber: 25
+          lineNumber: 103,
+          columnNumber: 21
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formUsername",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 107,
-          columnNumber: 27
+          lineNumber: 104,
+          columnNumber: 23
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 108,
-          columnNumber: 29
+          lineNumber: 105,
+          columnNumber: 25
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "update-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 109,
-          columnNumber: 31
+          lineNumber: 106,
+          columnNumber: 27
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapIcons.PersonFill, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 110,
-          columnNumber: 33
+          lineNumber: 107,
+          columnNumber: 29
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         isInvalid: touched.username && !!errors.username,
@@ -100195,39 +100259,39 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 112,
-          columnNumber: 31
+          lineNumber: 109,
+          columnNumber: 27
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 118,
-          columnNumber: 31
+          lineNumber: 115,
+          columnNumber: 27
         }
       }, errors.username))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formEmail",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 124,
-          columnNumber: 27
+          lineNumber: 121,
+          columnNumber: 23
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 125,
-          columnNumber: 29
+          lineNumber: 122,
+          columnNumber: 25
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "update-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 126,
-          columnNumber: 31
+          lineNumber: 123,
+          columnNumber: 27
         }
       }, "@"), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         isInvalid: touched.email && !!errors.email,
@@ -100240,47 +100304,47 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 129,
-          columnNumber: 31
+          lineNumber: 126,
+          columnNumber: 27
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 135,
-          columnNumber: 31
+          lineNumber: 132,
+          columnNumber: 27
         }
       }, errors.email))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formPassword",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 141,
-          columnNumber: 27
+          lineNumber: 138,
+          columnNumber: 23
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         className: "mb-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 142,
-          columnNumber: 29
+          lineNumber: 139,
+          columnNumber: 25
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "update-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 143,
-          columnNumber: 31
+          lineNumber: 140,
+          columnNumber: 27
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapIcons.KeyFill, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 144,
-          columnNumber: 33
+          lineNumber: 141,
+          columnNumber: 29
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         isInvalid: touched.password && !!errors.password,
@@ -100294,47 +100358,47 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 146,
-          columnNumber: 31
+          lineNumber: 143,
+          columnNumber: 27
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 153,
-          columnNumber: 31
+          lineNumber: 150,
+          columnNumber: 27
         }
       }, errors.password))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formPasswordConfirmation",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 159,
-          columnNumber: 27
+          lineNumber: 156,
+          columnNumber: 23
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         className: "mb-2",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 160,
-          columnNumber: 29
+          lineNumber: 157,
+          columnNumber: 25
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "update-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 161,
-          columnNumber: 31
+          lineNumber: 158,
+          columnNumber: 27
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapIcons.KeyFill, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 162,
-          columnNumber: 33
+          lineNumber: 159,
+          columnNumber: 29
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         isInvalid: touched.passwordConfirmation && !!errors.passwordConfirmation,
@@ -100348,46 +100412,46 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 164,
-          columnNumber: 31
+          lineNumber: 161,
+          columnNumber: 27
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 171,
-          columnNumber: 31
+          lineNumber: 168,
+          columnNumber: 27
         }
       }, errors.passwordConfirmation))), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Group, {
         controlId: "formBirthday",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 177,
-          columnNumber: 27
+          lineNumber: 174,
+          columnNumber: 23
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 178,
-          columnNumber: 29
+          lineNumber: 175,
+          columnNumber: 25
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.InputGroup.Prepend, {
         className: "update-card__prepend",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 179,
-          columnNumber: 31
+          lineNumber: 176,
+          columnNumber: 27
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrapIcons.Calendar2DateFill, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 180,
-          columnNumber: 33
+          lineNumber: 177,
+          columnNumber: 29
         }
       })), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control, {
         isInvalid: touched.birthday && !!errors.birthday,
@@ -100400,16 +100464,16 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 182,
-          columnNumber: 31
+          lineNumber: 179,
+          columnNumber: 27
         }
       }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Form.Control.Feedback, {
         type: "invalid",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 188,
-          columnNumber: 31
+          lineNumber: 185,
+          columnNumber: 27
         }
       }, errors.birthday))), loading ? /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Spinner, {
         className: "float-right",
@@ -100418,8 +100482,8 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 195,
-          columnNumber: 27
+          lineNumber: 192,
+          columnNumber: 23
         }
       }) : /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Button, {
         className: "float-right",
@@ -100429,40 +100493,40 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 197,
-          columnNumber: 27
+          lineNumber: 194,
+          columnNumber: 23
         }
       }, "Update"))))) : /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.ListGroup, {
         variant: "flush",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 206,
-          columnNumber: 17
+          lineNumber: 203,
+          columnNumber: 13
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.ListGroup.Item, {
         className: "profile-details",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 207,
-          columnNumber: 19
+          lineNumber: 204,
+          columnNumber: 15
         }
       }, "Username: ", userDetails.Username), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.ListGroup.Item, {
         className: "profile-details",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 208,
-          columnNumber: 19
+          lineNumber: 205,
+          columnNumber: 15
         }
       }, "Email: ", userDetails.Email), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.ListGroup.Item, {
         className: "profile-details",
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 209,
-          columnNumber: 19
+          lineNumber: 206,
+          columnNumber: 15
         }
       }, "Birdthday: ", _momentDefault.default(userDetails.Birthday).format('DD.MM.YYYY'))))), /*#__PURE__*/_reactDefault.default.createElement(_modalModalDefault.default, {
         title: "Confirmation",
@@ -100474,16 +100538,19 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 214,
-          columnNumber: 11
+          lineNumber: 211,
+          columnNumber: 7
         }
-      }))))
+      }))
     );
   }
-  _s(Profile, "IV/Fy+YeaxHLanUmixmCZQefraY=", false, function () {
-    return [_hooksUseLogOutDefault.default, _reactRedux.useDispatch, _hooksUseRequestDefault.default, _reactRedux.useSelector];
+  _s(Profile, "noi5SoyxeV82fYBXbzBl22weq4c=", false, function () {
+    return [_reactRedux.useDispatch, _hooksUseRequestDefault.default, _reactRedux.useSelector];
   });
   _c = Profile;
+  Profile.propTypes = {
+    onLoggedOut: _propTypesDefault.default.func.isRequired
+  };
   exports.default = Profile;
   var _c;
   $RefreshReg$(_c, "Profile");
@@ -100493,7 +100560,7 @@ try {
   window.$RefreshSig$ = prevRefreshSig;
 }
 
-},{"react":"3b2NM","react-bootstrap":"4n7hB","../modal/modal":"5orDP","./profile-view.scss":"3kYjk","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../hooks/useRequest":"2iXqm","moment":"5Hi32","formik":"67atH","react-bootstrap-icons":"3E1Qi","../../utils/registerValidation":"kMN7a","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","url:../../img/user.svg":"6OXrD","react-redux":"7GDa4","../../redux/actions/actions":"2QXPk","../../hooks/useLogOut":"5qTIe"}],"5orDP":[function(require,module,exports) {
+},{"react":"3b2NM","react-bootstrap":"4n7hB","../modal/modal":"5orDP","./profile-view.scss":"3kYjk","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../hooks/useRequest":"2iXqm","moment":"5Hi32","formik":"67atH","react-bootstrap-icons":"3E1Qi","../../utils/registerValidation":"kMN7a","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","url:../../img/user.svg":"6OXrD","react-redux":"7GDa4","../../redux/actions/actions":"2QXPk","prop-types":"4dfy5"}],"5orDP":[function(require,module,exports) {
 var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -100650,31 +100717,38 @@ try {
   var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/footer/footer.jsx";
   function Footer() {
     return (
-      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        className: "footer",
+      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Container, {
+        className: "footer d-flex justify-content-center align-items-center",
+        fluid: true,
         __self: this,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 7,
           columnNumber: 5
         }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        className: "d-flex justify-content-center align-items-center",
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 8,
           columnNumber: 7
         }
-      }, /*#__PURE__*/_reactDefault.default.createElement("h6", {
-        className: "text-muted",
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 9,
           columnNumber: 9
         }
-      }, "Copyright © 2021 by Julio López")))
+      }, /*#__PURE__*/_reactDefault.default.createElement("h6", {
+        className: "text-muted",
+        __self: this,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 10,
+          columnNumber: 11
+        }
+      }, "Copyright © 2021 by Julio López"))))
     );
   }
   exports.default = Footer;
@@ -100718,23 +100792,12 @@ try {
     if (visibilityFilter !== '') {
       filteredMovies = movies.filter(m => m.Title.toLowerCase().includes(visibilityFilter.toLowerCase()));
     }
-    if (!movies) return (
-      /*#__PURE__*/_reactDefault.default.createElement("div", {
-        className: "main-view",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 22,
-          columnNumber: 23
-        }
-      })
-    );
     return (
       /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 25,
+          lineNumber: 23,
           columnNumber: 4
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
@@ -100742,7 +100805,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 26,
+          lineNumber: 24,
           columnNumber: 5
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
@@ -100750,7 +100813,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 27,
+          lineNumber: 25,
           columnNumber: 7
         }
       }, filteredMovies.map(m => /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
@@ -100760,7 +100823,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 29,
+          lineNumber: 27,
           columnNumber: 11
         }
       }, /*#__PURE__*/_reactDefault.default.createElement(_movieCardMovieCardDefault.default, {
@@ -100768,7 +100831,7 @@ try {
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 30,
+          lineNumber: 28,
           columnNumber: 13
         }
       }))))))
@@ -100788,7 +100851,7 @@ try {
   window.$RefreshSig$ = prevRefreshSig;
 }
 
-},{"react":"3b2NM","react-redux":"7GDa4","../movie-card/movie-card":"7v6h3","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","prop-types":"4dfy5","react-bootstrap":"4n7hB","./movie-list.scss":"5MbTY"}],"5MbTY":[function() {},{}],"6sHXG":[function(require,module,exports) {
+},{"react":"3b2NM","react-redux":"7GDa4","../movie-card/movie-card":"7v6h3","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f","prop-types":"4dfy5","react-bootstrap":"4n7hB","./movie-list.scss":"5MbTY"}],"7v6h3":[function(require,module,exports) {
 var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -100798,156 +100861,75 @@ try {
   _parcelHelpers.defineInteropFlag(exports);
   var _react = require('react');
   var _reactDefault = _parcelHelpers.interopDefault(_react);
+  var _propTypes = require('prop-types');
+  var _propTypesDefault = _parcelHelpers.interopDefault(_propTypes);
   var _reactBootstrap = require('react-bootstrap');
-  require('./loading.scss');
-  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/loading/loading.jsx";
-  function Loading() {
+  var _reactRouterDom = require('react-router-dom');
+  require('./movie-card.scss');
+  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/movie-card/movie-card.jsx", _s = $RefreshSig$();
+  function MovieCard(props) {
+    _s();
+    const history = _reactRouterDom.useHistory();
+    const {movie} = props;
     return (
-      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card, {
+        className: "movie-card",
+        onClick: () => history.push(`/movies/${movie._id}`),
         __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 8,
+          lineNumber: 12,
           columnNumber: 5
         }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        className: "loading-view",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 9,
-          columnNumber: 7
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Spinner, {
-        animation: "grow",
-        variant: "primary",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 10,
-          columnNumber: 9
-        }
-      })))
-    );
-  }
-  _c = Loading;
-  exports.default = Loading;
-  var _c;
-  $RefreshReg$(_c, "Loading");
-  helpers.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-
-},{"react":"3b2NM","react-bootstrap":"4n7hB","./loading.scss":"67Juj","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f"}],"67Juj":[function() {},{}],"76eej":[function(require,module,exports) {
-var helpers = require("../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-helpers.prelude(module);
-try {
-  var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-  _parcelHelpers.defineInteropFlag(exports);
-  var _react = require('react');
-  var _reactDefault = _parcelHelpers.interopDefault(_react);
-  var _reactRedux = require('react-redux');
-  var _reactBootstrap = require('react-bootstrap');
-  var _movieCardMovieCard = require('../movie-card/movie-card');
-  var _movieCardMovieCardDefault = _parcelHelpers.interopDefault(_movieCardMovieCard);
-  require('./favorites-view.scss');
-  var _jsxFileName = "/Users/juliolopez/Documents/CareerFoundry/CareerFoundry Course/ReactJS/myFlixClient/src/components/favorites-view/favorites-view.jsx", _s = $RefreshSig$();
-  function FavoritesView() {
-    _s();
-    const movies = _reactRedux.useSelector(state => state.movies);
-    const userDetails = _reactRedux.useSelector(state => state.userDetails);
-    return (
-      /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Img, {
+        src: movie.ImagePath,
         __self: this,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 13,
-          columnNumber: 5
+          columnNumber: 7
         }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
+      }), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Body, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 14,
           columnNumber: 7
         }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        className: "d-flex justify-content-center",
+      }, /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Card.Text, {
         __self: this,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 15,
           columnNumber: 9
         }
-      }, /*#__PURE__*/_reactDefault.default.createElement("h4", {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 16,
-          columnNumber: 11
-        }
-      }, "My List of Favorites Movies")), /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Row, {
-        className: "favorites-movies d-flex justify-content-center",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 18,
-          columnNumber: 9
-        }
-      }, userDetails.FavoriteMovies && userDetails.FavoriteMovies.length > 0 ? movies.filter(movie => userDetails.FavoriteMovies && userDetails.FavoriteMovies.find(fav => fav === movie._id)).map(movie => /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        className: "d-flex justify-content-center align-items-center",
-        md: 3,
-        key: movie._id,
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 21,
-          columnNumber: 22
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement(_movieCardMovieCardDefault.default, {
-        movie: movie,
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 22,
-          columnNumber: 15
-        }
-      }))) : /*#__PURE__*/_reactDefault.default.createElement(_reactBootstrap.Col, {
-        className: "d-flex justify-content-center p-5",
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 25,
-          columnNumber: 11
-        }
-      }, /*#__PURE__*/_reactDefault.default.createElement("h6", {
-        __self: this,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 26,
-          columnNumber: 13
-        }
-      }, "Add movies to your favorites")))))
+      }, movie.Title)))
     );
   }
-  _s(FavoritesView, "CpWmwOGvDpXliyPARA60T12jOMY=", false, function () {
-    return [_reactRedux.useSelector, _reactRedux.useSelector];
+  _s(MovieCard, "9cZfZ04734qoCGIctmKX7+sX6eU=", false, function () {
+    return [_reactRouterDom.useHistory];
   });
-  _c = FavoritesView;
-  exports.default = FavoritesView;
+  _c = MovieCard;
+  ;
+  MovieCard.propTypes = {
+    movie: _propTypesDefault.default.shape({
+      Title: _propTypesDefault.default.string.isRequired,
+      Genre: _propTypesDefault.default.shape({
+        Name: _propTypesDefault.default.string.isRequired
+      }),
+      ImagePath: _propTypesDefault.default.string.isRequired
+    }).isRequired
+  };
+  exports.default = MovieCard;
   var _c;
-  $RefreshReg$(_c, "FavoritesView");
+  $RefreshReg$(_c, "MovieCard");
   helpers.postlude(module);
 } finally {
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
 
-},{"react":"3b2NM","react-redux":"7GDa4","react-bootstrap":"4n7hB","../movie-card/movie-card":"7v6h3","./favorites-view.scss":"41yPK","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f"}],"41yPK":[function() {},{}],"5iJih":[function() {},{}],"7panR":[function(require,module,exports) {
+},{"react":"3b2NM","prop-types":"4dfy5","react-bootstrap":"4n7hB","react-router-dom":"1PMSK","./movie-card.scss":"43n4t","@parcel/transformer-js/lib/esmodule-helpers.js":"5gA8y","../../../node_modules/@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"4Jj4f"}],"43n4t":[function() {},{}],"5MbTY":[function() {},{}],"5iJih":[function() {},{}],"7panR":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, '__esModule', {
   value: true

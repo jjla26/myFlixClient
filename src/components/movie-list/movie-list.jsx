@@ -19,8 +19,6 @@ function MoviesList(props) {
     filteredMovies = movies.filter(m => m.Title.toLowerCase().includes(visibilityFilter.toLowerCase()));
   }
 
-  if (!movies) return <div className="main-view"/>;
-
  return (
    <Row>
     <Col className="movie-list">
