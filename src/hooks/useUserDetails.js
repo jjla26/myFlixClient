@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux'
 
-import { setUserDetails, setError } from '../redux/actions/actions'
+import { setUserDetails, setError, setUser } from '../redux/actions/actions'
 import useRequest from './useRequest'
 
 const useUserDetails = () => {
@@ -12,6 +12,9 @@ const useUserDetails = () => {
       const response = await apiRequest('GET', `/users/${name}`)
       dispatch(setUserDetails(response.data))
     } catch (error) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      dispatch(setUser(null));
       dispatch(setError(error))
     }
   }
