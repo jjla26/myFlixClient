@@ -1,4 +1,10 @@
 
+.loading-view {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 @charset "UTF-8";
 /* import bootstrap to set changes */
 /*!
@@ -46429,12 +46435,6 @@ h3 {
   margin: 40px 0 70px 0;
 }
 
-.loading-view {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 @charset "UTF-8";
 /* import bootstrap to set changes */
 /*!
